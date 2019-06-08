@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{73275868-C419-4FE5-8EB7-4B48A5093D23}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="easyWebDsgn.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="easyWeb.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="easyWebDsgn">
+        <MSBuild Projects="easyWebDsgn.dproj"/>
+    </Target>
+    <Target Name="easyWebDsgn:Clean">
+        <MSBuild Projects="easyWebDsgn.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="easyWebDsgn:Make">
+        <MSBuild Projects="easyWebDsgn.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="easyWeb">
+        <MSBuild Projects="easyWeb.dproj"/>
+    </Target>
+    <Target Name="easyWeb:Clean">
+        <MSBuild Projects="easyWeb.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="easyWeb:Make">
+        <MSBuild Projects="easyWeb.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="easyWebDsgn;easyWeb"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="easyWebDsgn:Clean;easyWeb:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="easyWebDsgn:Make;easyWeb:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
