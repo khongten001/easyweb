@@ -1,4 +1,4 @@
-unit ewIdeHelpers;
+unit EWIdeHelpers;
 
 interface
 
@@ -37,11 +37,10 @@ type
     function GetUnnamed: Boolean; virtual;
   end;
 
-  TEWFormCreator = class(TEWBaseCreator, IOTAModuleCreator)
+  TEWBaseFormCreator = class(TEWBaseCreator, IOTAModuleCreator)
   private
     FFormTemplate: string;
     FImplTemplate: string;
-    FIntfTemplate: string;
     function CreateOTAFile(const ATemplate, AModuleIdent, AFormIdent, AAncestorIdent: string): IOTAFile;
   protected
     function ExpandTemplate(const ATemplate, AModuleIdent, AFormIdent, AAncestorIdent: string): string; virtual;
@@ -58,11 +57,9 @@ type
     function NewIntfSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile; virtual;
     procedure FormCreated(const FormEditor: IOTAFormEditor); virtual;
   public
-    constructor Create(const AFormTemplate, AImplTemplate, AIntfTemplate: string);
-    //
+    constructor Create(const AFormTemplate, AImplTemplate: string);
     property FormTemplate: string read FFormTemplate;
     property ImplTemplate: string read FImplTemplate;
-    property IntfTemplate: string read FIntfTemplate;
   end;
 
   TEWBaseProjectCreator = class(TEWBaseCreator,
@@ -167,17 +164,16 @@ begin
   Result := True;
 end;
 
-{ TWzOTAFormCreator }
+{ TEWBaseFormCreator }
 
-constructor TEWFormCreator.Create(const AFormTemplate, AImplTemplate, AIntfTemplate: string);
+constructor TEWBaseFormCreator.Create(const AFormTemplate, AImplTemplate: string);
 begin
   inherited Create;
   FFormTemplate := AFormTemplate;
   FImplTemplate := AImplTemplate;
-  FIntfTemplate := AIntfTemplate;
 end;
 
-function TEWFormCreator.ExpandTemplate(
+function TEWBaseFormCreator.ExpandTemplate(
   const ATemplate, AModuleIdent, AFormIdent, AAncestorIdent: string): string;
 begin
   Result := ATemplate;
@@ -186,67 +182,67 @@ begin
   Result := StringReplace(Result, '%ModuleIdent%', AModuleIdent, [rfReplaceAll]);
 end;
 
-function TEWFormCreator.GetCreatorType: string;
+function TEWBaseFormCreator.GetCreatorType: string;
 begin
   Result := sForm;
 end;
 
-function TEWFormCreator.GetAncestorName: string;
+function TEWBaseFormCreator.GetAncestorName: string;
 begin
   Result := '';
 end;
 
-function TEWFormCreator.GetFormName: string;
+function TEWBaseFormCreator.GetFormName: string;
 begin
   Result := '';
 end;
 
-function TEWFormCreator.GetImplFileName: string;
+function TEWBaseFormCreator.GetImplFileName: string;
 begin
   Result := '';
 end;
 
-function TEWFormCreator.GetIntfFileName: string;
+function TEWBaseFormCreator.GetIntfFileName: string;
 begin
   Result := '';
 end;
 
-function TEWFormCreator.GetMainForm: Boolean;
+function TEWBaseFormCreator.GetMainForm: Boolean;
 begin
   Result := False;
 end;
 
-function TEWFormCreator.GetShowForm: Boolean;
+function TEWBaseFormCreator.GetShowForm: Boolean;
 begin
   Result := True;
 end;
 
-function TEWFormCreator.GetShowSource: Boolean;
+function TEWBaseFormCreator.GetShowSource: Boolean;
 begin
   Result := True;
 end;
 
-function TEWFormCreator.NewFormFile(const FormIdent, AncestorIdent: string): IOTAFile;
+function TEWBaseFormCreator.NewFormFile(const FormIdent, AncestorIdent: string): IOTAFile;
 begin
 
   Result := CreateOTAFile(FormTemplate, '', FormIdent, AncestorIdent);
 end;
 
-function TEWFormCreator.NewImplSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
+function TEWBaseFormCreator.NewImplSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
 begin
   Result := CreateOTAFile(ImplTemplate, ModuleIdent, FormIdent, AncestorIdent);
 end;
 
-function TEWFormCreator.NewIntfSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
+function TEWBaseFormCreator.NewIntfSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
 begin
-  Result := CreateOTAFile(IntfTemplate, ModuleIdent, FormIdent, AncestorIdent);
+  Result := CreateOTAFile('', ModuleIdent, FormIdent, AncestorIdent);
 end;
 
-procedure TEWFormCreator.FormCreated(const FormEditor: IOTAFormEditor);
+procedure TEWBaseFormCreator.FormCreated(const FormEditor: IOTAFormEditor);
 begin
 end;
 
-function TEWFormCreator.CreateOTAFile(const ATemplate, AModuleIdent, AFormIdent, AAncestorIdent: string): IOTAFile;
+function TEWBaseFormCreator.CreateOTAFile(const ATemplate, AModuleIdent, AFormIdent, AAncestorIdent: string): IOTAFile;
 begin
   if ATemplate <> '' then
     Result := TOTAFile.Create(ExpandTemplate(ATemplate, AModuleIdent, AFormIdent, AAncestorIdent))

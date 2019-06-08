@@ -1,4 +1,4 @@
-unit ewIdeWizard;
+unit EWIdeWizard;
 
 
 interface
@@ -38,14 +38,16 @@ type
     function GetName: string; override;
   end;
 
-  { THostFormCreator }
+  { TEWFormCreator }
 
-  THostFormCreator = class(TEWFormCreator)
+  TEWFormCreator = class(TEWBaseFormCreator)
   public
     constructor Create(AMainForm: Boolean);
   end;
 
-  THostDataModuleCreator = class(TEWFormCreator)
+  { TEWDataModuleCreator }
+
+  TEWDataModuleCreator = class(TEWBaseFormCreator)
   public
     constructor Create;
     function GetImplFileName: string; override;
@@ -113,8 +115,8 @@ begin
   begin
     AApp := TEWProjectnCreator.Create();
     AModuleServices.CreateModule(AApp);
-    AModuleServices.CreateModule(THostDataModuleCreator.Create());
-    AModuleServices.CreateModule(THostFormCreator.Create(True));
+    AModuleServices.CreateModule(TEWDataModuleCreator.Create());
+    AModuleServices.CreateModule(TEWFormCreator.Create(True));
   end;
 end;
 
@@ -139,11 +141,11 @@ begin
   Result := C_EW_APP_WIZARD_NAME;
 end;
 
-{ THostFormCreator }
+{ TEWFormCreator }
 
-constructor THostFormCreator.Create;
+constructor TEWFormCreator.Create;
 var
-  AFormTemplate, AImplTemplate, AIntfTemplate, AInitialization: string;
+  AFormTemplate, AImplTemplate, AInitialization: string;
 begin
   AInitialization := '';
   if AMainForm then
@@ -183,16 +185,14 @@ begin
 
   AInitialization+
   'end. ';
-
-  AIntfTemplate := '';
-  inherited Create(AFormTemplate, AImplTemplate, AIntfTemplate);
+  inherited Create(AFormTemplate, AImplTemplate);
 end;
 
-{ THostDataModuleCreator }
+{ TEWDataModuleCreator }
 
-constructor THostDataModuleCreator.Create;
+constructor TEWDataModuleCreator.Create;
 var
-  AFormTemplate, AImplTemplate, AIntfTemplate: string;
+  AFormTemplate, AImplTemplate: string;
 begin
 
   AFormTemplate := 'object EWServerController: TEWServerController '+#13+
@@ -225,24 +225,17 @@ begin
 'implementation'+#13#10+
 #13#10+
 
-'function EWServerController: TEWServerController;'+#13#10+
-'begin' +#13#10+
-'  Result := TEWServerController(GlobalServerController);' +#13#10+
-'end; '+#13#10+#13#10+
-//'{%CLASSGROUP ''Vcl.Controls.TControl''}'+#13#10+
-#13#10+
 '{$R *.dfm}'+#13#10+
 #13#10+#13#10+
 'initialization'+#13#10+#13#10+
 'TEWServerController.Initialize;'+#13#10+#13#10+
 'end.';
 
-  AIntfTemplate := '';
-  inherited Create(AFormTemplate, AImplTemplate, AIntfTemplate);
+  inherited Create(AFormTemplate, AImplTemplate);
 
 end;
 
-function THostDataModuleCreator.GetImplFileName: string;
+function TEWDataModuleCreator.GetImplFileName: string;
 begin
   Result := IncludeTrailingPathDelimiter(TPath.GetDocumentsPath)+'Embarcadero\Studio\Projects\ServerController.pas';
 
@@ -256,7 +249,7 @@ var
 begin
   if Supports(BorlandIDEServices, IOTAModuleServices, AModuleServices) then
   begin
-    AModuleServices.CreateModule(THostFormCreator.Create(False));
+    AModuleServices.CreateModule(TEWFormCreator.Create(False));
   end;
 end;
 
