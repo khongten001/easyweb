@@ -1,4 +1,32 @@
-package easyWeb;
+package EasyWeb;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
 
 requires
   vcl,
@@ -10,20 +38,20 @@ requires
 
 contains
   EWBase in 'EWBase.pas',
+  EWButtons in 'EWButtons.pas',
+  EWCheckbox in 'EWCheckbox.pas',
+  EWConst in 'EWConst.pas',
+  EWEdits in 'EWEdits.pas',
+  EWForm in 'EWForm.pas' {EWForm},
+  EWImages in 'EWImages.pas',
+  EWIntf in 'EWIntf.pas',
+  EWLabel in 'EWLabel.pas',
+  EWProgressBars in 'EWProgressBars.pas',
   EWServerControllerBase in 'EWServerControllerBase.pas' {ewBaseServerController: TDataModule},
   EWSession in 'EWSession.pas',
-  EWForm in 'EWForm.pas' {bsBaseForm},
   EWStartup in 'EWStartup.pas' {frmStartup},
-  EWLabel in 'EWLabel.pas',
-  EWCheckbox in 'EWCheckbox.pas',
-  EWProgressBars in 'EWProgressBars.pas',
-  EWInputs in 'EWInputs.pas',
-  EWButtons in 'EWButtons.pas',
-  ewTypes in 'EWTypes.pas',
-  EWIntf in 'EWIntf.pas',
-  EWConst in 'EWConst.pas',
-  EWImages in 'EWImages.pas',
-  EWTimer in 'EWTimer.pas';
+  EWTimer in 'EWTimer.pas',
+  EWTypes in 'EWTypes.pas';
+
 
 end.
-

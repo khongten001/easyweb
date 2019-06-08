@@ -90,30 +90,30 @@
         <DCCReference Include="IndyCore.dcp"/>
         <DCCReference Include="vclimg.dcp"/>
         <DCCReference Include="EWBase.pas"/>
+        <DCCReference Include="EWButtons.pas"/>
+        <DCCReference Include="EWCheckbox.pas"/>
+        <DCCReference Include="EWConst.pas"/>
+        <DCCReference Include="EWEdits.pas"/>
+        <DCCReference Include="EWForm.pas">
+            <Form>EWForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="EWImages.pas"/>
+        <DCCReference Include="EWIntf.pas"/>
+        <DCCReference Include="EWLabel.pas"/>
+        <DCCReference Include="EWProgressBars.pas"/>
         <DCCReference Include="EWServerControllerBase.pas">
             <Form>ewBaseServerController</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="EWSession.pas"/>
-        <DCCReference Include="EWForm.pas">
-            <Form>bsBaseForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="EWStartup.pas">
             <Form>frmStartup</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="EWLabel.pas"/>
-        <DCCReference Include="EWCheckbox.pas"/>
-        <DCCReference Include="EWProgressBars.pas"/>
-        <DCCReference Include="EWInputs.pas"/>
-        <DCCReference Include="EWButtons.pas"/>
-        <DCCReference Include="EWTypes.pas"/>
-        <DCCReference Include="EWIntf.pas"/>
-        <DCCReference Include="EWConst.pas"/>
-        <DCCReference Include="EWImages.pas"/>
         <DCCReference Include="EWTimer.pas"/>
+        <DCCReference Include="EWTypes.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -141,9 +141,9 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\easyWeb.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\EasyWeb.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>easyWeb.bpl</RemoteName>
+                        <RemoteName>EasyWeb.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

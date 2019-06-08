@@ -15,7 +15,7 @@ uses
   EWForm,
   EWServerControllerBase,
   EWButtons,
-  EWInputs,
+  EWEdits,
   EWProgressBars,
   EWCheckBox,
   EWLabel,
@@ -28,17 +28,16 @@ procedure Register;
 begin
   RegisterPackageWizard(TEWApplicationWizard.Create);
   RegisterPackageWizard(TEWFormWizard.Create);
-
-  RegisterCustomModule(TewForm, TCustomModule);
-  RegisterCustomModule(TewBaseServerController, TCustomModule);
-  RegisterCustomModule(TewForm, TCustomModule);
-  RegisterComponents('EasyWeb', [TewButton]);
-  RegisterComponents('EasyWeb', [TewDropDown]);
-  RegisterComponents('EasyWeb', [TewButtonGroup]);
-  RegisterComponents('EasyWeb', [TewInput]);
-  RegisterComponents('EasyWeb', [TewProgressBar]);
-  RegisterComponents('EasyWeb', [TewCheckBox]);
-  RegisterComponents('EasyWeb', [TewLabel]);
+  RegisterCustomModule(TEWForm, TCustomModule);
+  RegisterCustomModule(TEWBaseServerController, TCustomModule);
+  RegisterCustomModule(TEWForm, TCustomModule);
+  RegisterComponents('EasyWeb', [TEWButton]);
+  RegisterComponents('EasyWeb', [TEWDropDown]);
+  RegisterComponents('EasyWeb', [TEWButtonGroup]);
+  RegisterComponents('EasyWeb', [TEWEdit]);
+  RegisterComponents('EasyWeb', [TEWProgressBar]);
+  RegisterComponents('EasyWeb', [TEWCheckBox]);
+  RegisterComponents('EasyWeb', [TEWLabel]);
   RegisterComponents('EasyWeb', [TEWImage]);
   RegisterComponents('EasyWeb', [TEWTimer]);
 end;

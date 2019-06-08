@@ -1,4 +1,4 @@
-unit ewProgressBars;
+unit EWProgressBars;
 
 interface
 
@@ -12,6 +12,7 @@ type
     FPosition: integer;
     FStriped: Boolean;
     FStyle: TewButtonType;
+    FAnimated: Boolean;
     function GetMax: integer;
     function GetMin: integer;
     procedure SetMax(const Value: integer);
@@ -21,6 +22,7 @@ type
     procedure SetStriped(const Value: Boolean);
     procedure SetStyle(const Value: TewButtonType);
     function GetStyleString: string;
+    procedure SetAnimated(const Value: Boolean);
   protected
     function GetHtml: string; override;
     procedure Paint; override;
@@ -28,6 +30,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property Animated: Boolean read FAnimated write SetAnimated default False;
     property Max: integer read GetMax write SetMax;
     property Min: integer read GetMin write SetMin;
     property Position: integer read GetPosition write SetPosition;
@@ -44,6 +47,8 @@ uses SysUtils, Types, Graphics;
 constructor TEWProgressBar.Create(AOwner: TComponent);
 begin
   inherited;
+  Width := 200;
+  Height := 20;
   FMin := 0;
   FMax := 100;
   FPosition := 50;
@@ -62,7 +67,8 @@ begin
   inherited;
   AStriped := '';
   if FStriped then AStriped := ' progress-bar-striped ';
-
+  if FAnimated then AStriped := AStriped + ' progress-bar-animated';
+  
   Result := '<div name="'+Name+'" id="'+Name+'" '+GetCss+' class="progress">'+
   '<div class="progress-bar '+GetStyleString+' '+AStriped+'" role="progressbar" style="width: '+fPosition.ToString+'%" aria-valuenow="'+FPosition.ToString+
     '" aria-valuemin="'+FMin.ToString+'" aria-valuemax="'+FMax.ToString+'"></div>'+
@@ -103,6 +109,8 @@ var
 begin
   Canvas.Pen.Style := psSolid;
   Canvas.Pen.Color := clSilver;
+  Canvas.Brush.Color := clWhite;
+  Canvas.Brush.Style := bsSolid;
   Canvas.RoundRect(ClientRect, 8, 8);
   Canvas.Brush.Color := clWebDodgerBlue;
   Canvas.RoundRect(0, 0, Round((ClientWidth/100) * FPosition), Height, 8, 8);
@@ -112,6 +120,16 @@ begin
   Canvas.Brush.Style := bsClear;
   AText := DesignTimeCaption;
   Canvas.TextRect(ARect, AText, [tfVerticalCenter, tfCenter, tfSingleLine]);
+end;
+
+procedure TEWProgressBar.SetAnimated(const Value: Boolean);
+begin
+  if FAnimated <> Value then
+  begin
+    FAnimated := Value;
+    FStriped := True;
+    Changed;
+  end;
 end;
 
 procedure TEWProgressBar.SetMax(const Value: integer);
