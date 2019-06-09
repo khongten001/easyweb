@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Graphics,
-  Controls, Forms, Dialogs, ewBase, ewSession, ewIntf, ewTypes;
+  Controls, Forms, Dialogs, EWBase, EWSession, EWIntf, EWTypes;
 
 type
   TEWForm = class;
@@ -36,6 +36,7 @@ type
     class procedure SetAsMainForm;
     property Session: TewSession read GetSession write SetSession;
   published
+    property Caption;
     property ExtraMeta: TStrings read FExtraMeta write SetExtraMeta;
     property ExtraScript: TStrings read FExtraScript write SetExtraScript;
     property JavascriptIncludes: TStrings read FJavascriptIncludes write SetJavascriptIncludes;
@@ -81,13 +82,14 @@ var
   ICount: integer;
   AListners: TStrings;
   AIncludes: TStrings;
-  APreLoad: TStrings;
   AGlobals: TStrings;
+  //ACss: TStrings;
 begin
   AListners := TStringList.Create;
   AIncludes := TStringList.Create;
-  APreLoad := TStringList.Create;
   AGlobals := TStringList.Create;
+
+  //ACss := TStringList.Create;
   try
     for ICount := 0 to FJavascriptIncludes.Count-1 do
       AIncludes.Add('<script src="'+FJavascriptIncludes[ICount]+'"></script>');
@@ -97,99 +99,95 @@ begin
       if Supports(Self.Components[ICount], IEWBaseComponent, c) then
         C.GetGlobalVars(AGlobals);
 
+
       if Supports(Self.Components[ICount], IEWBaseVisualObject, i) then
+      begin
+        //ACss.Add('.'+c.Name+' { '+i.CssCommaText+' } '+#13#10);
         i.GetEventListners(AListners);
+      end;
     end;
 
-    Result := '<!DOCTYPE html>'+
-              '<html id="'+Self.Name+'" lang="en">'+
-              '<head>'+
-              '<title></title>'+
-              '<meta charset="utf-8">'+
-              '<meta name="viewport" content="width=device-width, initial-scale=1">'+
-              FExtraMeta.Text+
-              '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">'+
-              APreLoad.Text+
-              '<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>'+
-              '<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>'+
-              '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>'+
-              AIncludes.Text+
-              '<script>'+
-               #13#10+#13#10+AGlobals.Text+#13#10+
-              #13#10+#13#10+AListners.Text+#13#10+
+    Result := '<!DOCTYPE html>'+CR+
+              '<html id="'+Self.Name+'" lang="en">'+CR+
+              '<head>'+CR+
+              '<title>'+Caption+'</title>'+CR+
+              '<meta charset="utf-8">'+CR+
+              '<meta name="viewport" content="width=device-width, initial-scale=1">'+CR+
+              Trim(FExtraMeta.Text)+
+              '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">'+CR+
+              '<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>'+CR+
+              '<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>'+CR+
+              '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>'+CR+
+              Trim(AIncludes.Text)+CR+
+              '<style>'+CR+
+              //Trim(ACss.Text)+#13#10+
+              '</style>'+CR+
+              '<script>'+CR+
+              Trim(Trim(AGlobals.Text)+CR+
+              Trim(AListners.Text))+CR+
+              CR+
+              'function getQueryStringValue (key) '+CR+
+              '{'+CR+
+              '  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));'+CR+
+              '}'+CR+CR+
+              'function httpGet(theUrl)'+CR+
+              '{'+CR+
+              '  var xmlHttp = new XMLHttpRequest();'+CR+
+              '  xmlHttp.open( "GET", theUrl, false); '+CR+
+              '  xmlHttp.send( null );'+CR+
+              '  return xmlHttp.responseText;'+CR+
+              '} '+CR+CR+
 
-              'function getQueryStringValue (key) {'+
-              'return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));'+
-              '}'+
+              'function asyncEvent(aaction, aname, avalue)'+CR+
+              '{'+CR+
+              '  var url = "http://localhost:8080?async=T&session="+getQueryStringValue("session")+"&action="+aaction+"&name="+aname+"&value="+avalue; '+CR+
+              '  var response = httpGet(url);'+CR+
+              '  if (response=="reload") '+CR+
+              '  {'+CR+
+              '    location.reload();'+CR+
+              '    Exit;' +CR+
+              '  }'+CR+
+              '  var ajson = JSON.parse(response); '+CR+
+              '  ajson.forEach(function(element) {'+CR+
+              '  document.getElementById(element.name).outerHTML = element.html;'+CR+
+              '  if (element.script != "") {eval(element.script);}; '+CR+
+              '  });'+CR+
+              '};'+CR+CR+
 
+              'function asyncKeypress(aname, avalue)'+CR+
+              '{'+CR+
+              '  var url = "http://localhost:8080?async=T&session="+getQueryStringValue("session")+"&action=keypress&name="+aname+"&value="+avalue; '+CR+
+              '  var response = httpGet(url);'+CR+
+              '  alert(element.html); '+CR+
+              '  var ajson = JSON.parse(response); '+CR+
+              '  ajson.forEach(function(element) {'+CR+
+              '  document.getElementById(element.name).outerHTML = element.html;'+CR+
 
-              'function httpGet(theUrl)'+
-              '{'+
-              '    var xmlHttp = new XMLHttpRequest();'+
-              '    xmlHttp.open( "GET", theUrl, false); '+
-              '    xmlHttp.send( null );'+
-              '    return xmlHttp.responseText;'+
-              '} '+
+              '  });'+CR+
 
-              'function asyncEvent(aaction, aname, avalue)'+
-              '{'+
-              'var url = "http://localhost:8080?async=T&session="+getQueryStringValue("session")+"&action="+aaction+"&name="+aname+"&value="+avalue; '+
+              '};'+CR+
+              FExtraScript.Text+CR+
+              '</script>'+CR+
 
-              'var response = httpGet(url);'+
-              'if (response=="reload") '+
-              '{'+
-              'location.reload();'+
-              'Exit;' +
-              '}'+
-              'var ajson = JSON.parse(response); '+
-
-
-              'ajson.forEach(function(element) {'+
-                'document.getElementById(element.name).outerHTML = element.html;'+
-                'if (element.script != "") {eval(element.script);}; '+
-                //'var ascript = document.getElementsByTagName("script")[0]; '+
-                //'alert(ascript);'+
-              '});'+
-              '};'+
-
-              'function asyncKeypress(aname, avalue)'+
-              '{'+
-              'var url = "http://localhost:8080?async=T&session="+getQueryStringValue("session")+"&action=keypress&name="+aname+"&value="+avalue; '+
-              'var response = httpGet(url);'+
-              'alert(element.html); '+
-              'var ajson = JSON.parse(response); '+
-              'ajson.forEach(function(element) {'+
-              'document.getElementById(element.name).outerHTML = element.html;'+
-              //'alert(element.html); '+
-              //'var script = element.getElementById("script");' +
-              //'alert(script); '+
-              //'eval(element.html); '+
-              '});'+
-
-              '};'+
-              FExtraScript.Text+
-
-              '</script>'+
-
-              '</head>'+
+              '</head>'+CR+
               '<body>';
 
     for ICount := 0 to ComponentCount-1 do
     begin
       if Supports(Self.Components[ICount], IewBaseComponent, i) then
       begin
-        Result := Result + IewBaseComponent(i).Html;
+        Result := Result + IewBaseComponent(i).Html +CR;
       end;
       //if Supports(Self.Components[ICount], IewBaseObject, i) then Result := Result + i.Html;
     end;
-    Result := Result +
-              '</body>'+
+    Result := Result +CR+
+              '</body>'+CR+
             '</html>';
   finally
     AListners.Free;
     AIncludes.Free;
-    APreLoad.Free;
     AGlobals.Free;
+    //ACss.Free;
   end;
 
 end;

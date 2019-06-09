@@ -2,7 +2,7 @@ unit EWBase;
 
 interface
 
-uses Messages, Classes, Controls, Forms, ewTypes, ewIntf;
+uses Messages, Classes, Controls, Forms, EWTypes, EWIntf;
 
 type
   TEWBaseComponent = class(TComponent, IEWBaseComponent)
@@ -75,7 +75,7 @@ type
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
     property Html: string read GetHtml;
     property HasChanged: Boolean read GetHasChanged write FChanged;
-
+    function CssCommaText: string; virtual;
   published
     property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
     property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
@@ -190,7 +190,7 @@ end;
 
 procedure TewBaseObject.BuildCss(AProperties: TStrings);
 begin
-  //AProperties.Values['border'] := 'solid; black; 1px';
+  //AProperties.Values['border'] := 'solid black 1px';
   AProperties.Values['left'] := IntToStr(Left) + 'px';
   AProperties.Values['top'] := IntToStr(Top) + 'px';
   AProperties.Values['width'] := IntToStr(Width) + 'px';
@@ -221,6 +221,28 @@ begin
   FCssProperties := TStringList.Create;
   FMouseOver := False;
 
+end;
+
+function TewBaseObject.CssCommaText: string;
+var
+  AStrings:TStrings;
+  ICount: integer;
+begin
+  Result := '';
+  AStrings := TStringList.Create;
+  try
+    BuildCss(AStrings);
+    //Result := AStrings.CommaText;
+    for ICount := 0 to AStrings.Count-1 do
+    begin
+      Result := Result + AStrings.Names[ICount]+': '+AStrings.ValueFromIndex[ICount];
+      if ICount < AStrings.Count-1 then
+        Result := Result + '; ';
+    end;
+
+  finally
+    AStrings.Free;
+  end;
 end;
 
 function TewBaseObject.DesignTimeCaption: string;

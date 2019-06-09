@@ -29,6 +29,7 @@ type
 
   IEWBaseVisualObject = interface
     ['{C55735AD-4A52-4E28-9F0B-DB1BDEC998A4}']
+    function CssCommaText: string;
     procedure GetEventListners(AListners: TStrings);
     procedure GetGlobalVars(AStrings: TStrings);
     procedure DoMouseEnter(AParams: TStrings);
@@ -37,6 +38,7 @@ type
     procedure DoRightClick(AParams: TStrings);
     procedure DoDblClick(AParams: TStrings);
     procedure DoOnChange(AParams: TStrings);
+
   end;
 
   IEWBaseObjectItemClickable = interface
