@@ -8,22 +8,26 @@ type
   TEWButton = class(TewBaseObject, IEWButton)
   private
     FButtonType: TewButtonType;
+    FBorderRadius: integer;
     FText: string;
     function GetButtonType: TewButtonType;
     function GetButtonTypeStr: string;
     procedure SetButtonType(const Value: TewButtonType);
     function GetText: string;
     procedure SetText(const Value: string);
+    procedure SetBorderRadius(const Value: integer);
   protected
     procedure GetEventListners(AListners: TStrings); override;
     function GetHtml: string; override;
     function DesignTimeCaption: string; override;
     procedure Paint; override;
+    procedure BuildCss(AProperties: TStrings); override;
   public
     constructor Create(AOwner: TComponent); override;
   published
     property ButtonType: TewButtonType read GetButtonType write SetButtonType default btSecondary;
     property Text: string read GetText write SetText;
+    property BorderRadius: integer read FBorderRadius write SetBorderRadius default 0;
   end;
 
   TEWDropDown = class(TewButton, IEWBaseObjectItemClickable)
@@ -84,6 +88,13 @@ uses Types, Graphics, SysUtils;
 
 { TEWButton }
 
+procedure TEWButton.BuildCss(AProperties: TStrings);
+begin
+  inherited;
+  if FBorderRadius > 0 then AProperties.Values['corner-radius'] := BorderRadius.ToString+'px';
+
+end;
+
 constructor TEWButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -125,7 +136,7 @@ end;
 function TEWButton.GetHtml: string;
 begin
   inherited;
-  Result := '<button name="' + Name + '" type="button" id="'+Name+'" '+ GetCss +'class="' +GetButtonTypeStr + '">' + FText + '</button>';
+  Result := '<div name="' + Name + '" id="'+Name+'" '+GetCss+'><button style="height:100%;width:100%;"  type="button" class="' +GetButtonTypeStr + '">' + FText + '</button></div>';
 end;
 
 function TEWButton.GetText: string;
@@ -186,6 +197,15 @@ begin
   end;
 end;
 
+procedure TEWButton.SetBorderRadius(const Value: integer);
+begin
+  if FBorderRadius <> Value then
+  begin
+    FBorderRadius := Value;
+    Changed;
+  end;
+end;
+
 procedure TEWButton.SetText(const Value: string);
 begin
   if FText <> Value then
@@ -241,9 +261,9 @@ var
   ICount: integer;
 begin
   inherited;
-  Result := '<div '+GetCss+'><button class="' +
+  Result := '<div id="'+Name+'" '+GetCss+'><button class="' +
     GetButtonTypeStr +
-    ' dropdown-toggle" type="button" id="'+Name+'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+    ' dropdown-toggle" style="width:100%;height:100%;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
     + '  ' + Text + '</button>'+
     '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
   for ICount := 0 to FItems.Count - 1 do

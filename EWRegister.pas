@@ -23,7 +23,8 @@ uses
   EWIdeHelpers,
   EWImages,
   EWTimer,
-  EWTypes;
+  EWTypes,
+  EWSpacer;
 
 type
   TEWFontFamilyList = class(TStringProperty)
@@ -48,9 +49,8 @@ begin
   RegisterComponents('EasyWeb', [TEWCheckBox]);
   RegisterComponents('EasyWeb', [TEWLabel]);
   RegisterComponents('EasyWeb', [TEWImage]);
-
+  RegisterComponents('EasyWeb', [TEWSpacer]);
   RegisterComponents('EasyWeb', [TEWTimer]);
-
   RegisterPropertyEditor(TypeInfo(string), TEWFont, 'Family', TEWFontFamilyList);
 
 end;

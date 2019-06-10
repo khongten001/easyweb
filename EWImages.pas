@@ -79,8 +79,8 @@ begin
 
   end;
   Result := '';
-  Result := '<img id="'+Name+'" name="'+Name+'" rel="prefetch" '+GetCss+
-            'class= "'+GetClass+'" src="'+ASrc+'"></img>';
+  Result := '<div '+GetCss+'><img style="width:100%;height:auto;" id="'+Name+'" name="'+Name+'" rel="prefetch" '+
+            'class= "'+GetClass+'" src="'+ASrc+'"></img></div>';
 end;
 
 function TEWImage.GetPreloadUrl: string;

@@ -105,8 +105,8 @@ end;
 function TEWEdit.GetHtml: string;
 begin
   inherited;
-  Result := '<input ' + GetCss + ' type="text"  class="form-control" placeholder="' + FPlaceHolder + '" id="' +
-    Name + '" value="' + FText + '" ">';
+  Result := '<div '+GetCss+'><input type="text"  class="form-control" placeholder="' + FPlaceHolder + '" id="' +
+    Name + '" value="' + FText + '" "></div>';
 end;
 
 function TEWEdit.GetPlaceHolder: string;

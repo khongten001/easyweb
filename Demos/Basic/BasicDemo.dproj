@@ -139,7 +139,6 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="ServerController.pas">
-            <ModuleName>ServerControll0er</ModuleName>
             <Form>EWServerController</Form>
             <DesignClass>TEWBaseServerController</DesignClass>
         </DCCReference>

@@ -2,7 +2,7 @@ unit EWBase;
 
 interface
 
-uses Messages, Classes, Controls, Forms, EWTypes, EWIntf;
+uses Messages, Classes, Controls, Forms, EWTypes, EWIntf, Types;
 
 type
   TEWBaseComponent = class(TComponent, IEWBaseComponent)
@@ -33,6 +33,7 @@ type
     function GetHasChanged: Boolean;
     function GetName: string;
     function GetScript: string; virtual;
+    function BrowserSize: TSize;
   protected
     procedure GetEventListners(AListners: TStrings); virtual;
     procedure GetGlobalVars(AStrings: TStrings); virtual;
@@ -77,6 +78,7 @@ type
     property HasChanged: Boolean read GetHasChanged write FChanged;
     function CssCommaText: string; virtual;
   published
+    property Align;
     property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
     property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
     property OnClick: TNotifyEvent read FOnClick write FOnClick;
@@ -86,7 +88,7 @@ type
 
 implementation
 
-uses SysUtils, Graphics, Types, EWServerControllerBase;
+uses SysUtils, Graphics, EWServerControllerBase;
 
 { TEWBaseComponent }
 
@@ -188,17 +190,73 @@ begin
   AEvents.Add('$(document).on(''click'',''#'+n+''',function(){ asyncEvent("clickitem", "'+n+'", '+i+'); }); ');
 end;
 
+function TewBaseObject.BrowserSize: TSize;
+var
+  c: TComponent;
+  i: IewForm;
+begin
+  c := Self;
+  while (c is TEWBaseForm) = False do
+    c := c.Owner;
+  if (c is TEWBaseForm) then
+  begin
+    Result.cx := (c as TEWBaseForm).ClientRect.Width;
+    Result.cy := (c as TEWBaseForm).ClientRect.Height;
+  end;
+end;
+
 procedure TewBaseObject.BuildCss(AProperties: TStrings);
 begin
   //AProperties.Values['border'] := 'solid black 1px';
-  AProperties.Values['left'] := IntToStr(Left) + 'px';
-  AProperties.Values['top'] := IntToStr(Top) + 'px';
-  AProperties.Values['width'] := IntToStr(Width) + 'px';
-  AProperties.Values['height'] := IntToStr(Height) + 'px';
   AProperties.Values['position'] := 'absolute';
+  if Align = alNone then
+  begin
+    AProperties.Values['left'] := IntToStr(Left) + 'px';
+    AProperties.Values['top'] := IntToStr(Top) + 'px';
+    AProperties.Values['width'] := IntToStr(Width) + 'px';
+    AProperties.Values['height'] := IntToStr(Height) + 'px';
+  end;
+  if Align = alTop then
+  begin
+    AProperties.Values['left'] := IntToStr(Left) + 'px';
+    AProperties.Values['top'] := IntToStr(Top) + 'px';
+    AProperties.Values['right'] := (BrowserSize.cx - (Width+Left)).ToString+ 'px';
+    AProperties.Values['height'] := IntToStr(Height) + 'px';
+  end;
+
+  if Align = alLeft then
+  begin
+    AProperties.Values['left'] := IntToStr(Left) + 'px';
+    AProperties.Values['top'] := IntToStr(Top) + 'px';
+    AProperties.Values['width'] := IntToStr(Width) + 'px';
+    AProperties.Values['bottom'] := (BrowserSize.cy - (Height+Top)).ToString+ 'px';
+  end;
+
+  if Align = alRight then
+  begin
+    AProperties.Values['right'] := (BrowserSize.cx - (Width+Left)).ToString+ 'px';
+    AProperties.Values['top'] := IntToStr(Top) + 'px';
+    AProperties.Values['width'] := IntToStr(Width) + 'px';
+    AProperties.Values['bottom'] := (BrowserSize.cy - (Height+Top)).ToString+ 'px';
+  end;
+
+  if Align = alBottom then
+  begin
+    AProperties.Values['bottom'] := '0px;';//(BrowserSize.cy - (Height+Top)).ToString+ 'px';
+    AProperties.Values['left'] := IntToStr(left) + 'px';
+    AProperties.Values['right'] := (BrowserSize.cx - (Width+Left)).ToString+ 'px';
+    AProperties.Values['height'] := IntToStr(Height) + 'px';
+  end;
+
+  if Align = alClient then
+  begin
+    AProperties.Values['left'] := IntToStr(Left) + 'px';
+    AProperties.Values['right'] := (BrowserSize.cx - (Width+Left)).ToString+ 'px';
+    AProperties.Values['top'] := IntToStr(Top) + 'px';
+    AProperties.Values['bottom'] := (BrowserSize.cy - (Height+Top)).ToString+ 'px';
+  end;
   if not Visible then
     AProperties.Values['display'] := 'none';
-
 end;
 
 procedure TewBaseObject.Changed;

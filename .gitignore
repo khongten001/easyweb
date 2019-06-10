@@ -7,3 +7,9 @@
 /EasyWeb.groupproj.local
 /EasyWeb.identcache
 /EasyWeb.stat
+/Demos/Basic/Win32/Debug
+/Demos/Basic/*.local
+/Demos/Basic/*.identcache
+/Demos/Basic/*.res
+/Demos/Basic/*.stat
+/Demos/Basic/__history/*.~1~

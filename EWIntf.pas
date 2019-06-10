@@ -119,7 +119,10 @@ type
 
   IEWImage = interface
     ['{EB70D8DD-3838-4A74-982D-3C0CF6E1F172}']
-    function GetPreloadUrl: string;
+  end;
+
+  IEWSpacer = interface
+    ['{94056032-0A61-443A-A354-94668A118032}']
   end;
 
   IEWTimer = interface

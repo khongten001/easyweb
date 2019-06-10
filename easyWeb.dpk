@@ -51,7 +51,7 @@ contains
   EWSession in 'EWSession.pas',
   EWStartup in 'EWStartup.pas' {frmStartup},
   EWTimer in 'EWTimer.pas',
-  EWTypes in 'EWTypes.pas';
-
+  EWTypes in 'EWTypes.pas',
+  EWSpacer in 'EWSpacer.pas';
 
 end.
