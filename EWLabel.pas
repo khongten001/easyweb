@@ -87,7 +87,7 @@ begin
     taVerticalCenter: ATranslate := '50%';
     taAlignBottom: ATranslate := '100%';
   end;
-  Result := '<div class="'+Name+'" id="'+Name+'" '+GetCss+'><div style=";position: relative;top: '+ATranslate+';transform: translateY(-'+ATranslate+')">'+FText+'</div><div>';
+  Result := '<div class="'+Name+'" id="'+Name+'" '+GetCss+'><div style="position: relative; top: '+IntToStr(Height div 2)+'px; transform: translateY(-'+ATranslate+')">'+FText+'</div></div>';
   //Result := '<div class="'+Name+'" id="'+Name+'"><div style=";position: relative;top: '+ATranslate+';transform: translateY(-'+ATranslate+')">'+FText+'</div><div>';
 end;
 

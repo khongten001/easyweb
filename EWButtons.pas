@@ -241,10 +241,10 @@ var
   ICount: integer;
 begin
   inherited;
-  Result := '<div class="dropdown">' + '<button ' + GetCss + ' class="' +
+  Result := '<div '+GetCss+'><button class="' +
     GetButtonTypeStr +
     ' dropdown-toggle" type="button" id="'+Name+'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
-    + '  ' + Text + '</button>' +
+    + '  ' + Text + '</button>'+
     '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
   for ICount := 0 to FItems.Count - 1 do
     Result := Result + '<a class="dropdown-item" id="'+Name+'-'+ICount.ToString+'" href="#">' + FItems[ICount] + '</a>';

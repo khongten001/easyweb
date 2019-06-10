@@ -39,7 +39,7 @@ type
 
     procedure AddMouseEnterEvent(AEvents: TStrings);
     procedure AddMouseLeaveEvent(AEvents: TStrings);
-    procedure AddClickEvent(AEvents: TStrings);
+    procedure AddClickEvent(AEvents: TStrings); virtual;
     procedure AddRightClickEvent(AEvents: TStrings);
     procedure AddClickItemEvent(AItemIndex: integer; AEvents: TStrings);
     procedure AddDblClickEvent(AEvents: TStrings);

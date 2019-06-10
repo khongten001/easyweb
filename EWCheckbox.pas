@@ -17,6 +17,7 @@ type
     function DesignTimeCaption: string; override;
     function GetHtml: string; override;
     procedure DoClick(AParams: TStrings); override;
+    procedure AddClickEvent(AEvents: TStrings); override;
   published
     property Checked: Boolean read GetChecked write SetChecked;
     property Text: string read GetText write SetText;
@@ -27,6 +28,11 @@ implementation
 
 { TEWCheckBox }
 
+procedure TEWCheckBox.AddClickEvent(AEvents: TStrings);
+begin
+   AEvents.Add('$(document).on(''click'',''#'+Name+''',function(){ asyncEvent("click", "'+Name+'", document.getElementById("'+Name+'").checked); }); ');
+end;
+
 function TEWCheckBox.DesignTimeCaption: string;
 begin
   Result := Text;
@@ -36,7 +42,8 @@ end;
 
 procedure TEWCheckBox.DoClick(AParams: TStrings);
 begin
-  FChecked := AParams.Values['value'] = 'true';
+  Checked := AParams.Values['value'] = 'true';
+
   inherited;
 end;
 
@@ -52,7 +59,7 @@ begin
   AChecked := '';
   if FChecked then
     AChecked := 'checked';
-  Result := '<input '+GetCss+' class="input-checkbox " name="'+Name+'" id="'+Name+'" style="height:20px;width:20px" type="checkbox">';
+  Result := '<input '+GetCss+' class="input-checkbox " name="'+Name+'" id="'+Name+'" style="height:20px;width:20px" type="checkbox" '+AChecked+'>';
 end;
 
 function TEWCheckBox.GetText: string;
