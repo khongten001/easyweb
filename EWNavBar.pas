@@ -1,0 +1,375 @@
+unit EWNavBar;
+
+interface
+
+uses Classes, EWIntf, EWBase, VCL.Graphics, EWTypes;
+
+type
+  TEWNavBar = class;
+
+  TEWNavBarStyle = (nbsDefault, nbsLight, nbsPrimary, nbsDark);
+
+  TEWNavBarItem = class(TCollectionItem)
+  private
+    FNavBar: TEWNavBar;
+    FText: string;
+    FDropdownItems: TStrings;
+    procedure SetText(const Value: string);
+    procedure Changed;
+    procedure SetDropDownItems(const Value: TStrings);
+  public
+    function GetHtml: string;
+    procedure Assign(Source: TPersistent); override;
+  published
+    constructor Create(Collection: TCollection); override;
+    property DropdownItems: TStrings read FDropdownItems write SetDropDownItems;
+    property Text: string read FText write SetText;
+  end;
+
+  TEWNavBarItemCollection = class(TCollection)
+  private
+    FNavBar: TEWNavBar;
+  protected
+    function GetOwner: TPersistent; override;
+    function GetItem(Index: Integer): TEWNavBarItem;
+    procedure SetItem(Index: Integer; Value: TEWNavBarItem);
+  public
+    constructor Create(ANavBar: TEWNavBar);
+    function Add: TEWNavBarItem;
+    function Insert( Index: Integer ): TEWNavBarItem;
+    property Items[index: Integer]: TEWNavBarItem read GetItem write SetItem; default;
+  end;
+
+  TEWNavBar = class(TEWBaseObject, IEWNavBar)
+  private
+    FItems: TEWNavBarItemCollection;
+    FTitle: string;
+    FStyle: TEWNavBarStyle;
+    FOnItemClick: TEWNavItemClickEvent;
+    FOnBrandClick: TNotifyEvent;
+    function GetStyleClass: string;
+    procedure SetItems(const Value: TEWNavBarItemCollection);
+    procedure SetTitle(const Value: string);
+    procedure SetStyle(const Value: TEWNavBarStyle);
+  protected
+    procedure DoItemClick(ASender: TObject; AData: string);
+    procedure GetEventListners(AListners: TStrings); override;
+    procedure BuildCss(AProperties: TStrings); override;
+    function DesignTimeCaption: string; override;
+    function GetHtml: string; override;
+    procedure Paint; override;
+    procedure DoEvent(AParams: TStrings); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property Items: TEWNavBarItemCollection read FItems write SetItems;
+    property Title: string read FTitle write SetTitle;
+    property Style: TEWNavBarStyle read FStyle write SetStyle default nbsDefault;
+    property OnBrandClick: TNotifyEvent read FOnBrandClick write FOnBrandClick;
+    property OnItemClick: TEWNavItemClickEvent read FOnItemClick write FOnItemClick;
+
+  end;
+
+implementation
+
+uses Types, SysUtils, VCL.Controls, Json;
+
+{ TEWNavBar }
+
+procedure TEWNavBar.BuildCss(AProperties: TStrings);
+begin
+ inherited;
+end;
+
+constructor TEWNavBar.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FItems := TEWNavBarItemCollection.Create(Self);
+  Align := alTop;
+end;
+
+function TEWNavBar.DesignTimeCaption: string;
+begin
+  inherited;
+
+end;
+
+destructor TEWNavBar.Destroy;
+begin
+  FItems.Free;
+  inherited;
+end;
+
+procedure TEWNavBar.DoEvent(AParams: TStrings);
+var
+  AIndex: integer;
+  ASubIndex: integer;
+begin
+  inherited;
+  AIndex := StrToIntDef(AParams.Values['index'], -1);
+  ASubIndex := StrToIntDef(AParams.Values['sub-index'], -1);
+  if (AIndex = -1) and (Assigned(FOnBrandClick)) then
+    FOnBrandClick(Self)
+  else
+  begin
+    if Assigned(FOnItemClick) then
+      FOnItemClick(Self, FItems[AIndex], ASubIndex);
+  end;
+end;
+
+procedure TEWNavBar.DoItemClick(ASender: TObject; AData: string);
+var
+  AJson: TJSONObject;
+  AIndex: integer;
+  ASubIndex: integer;
+begin
+  AJson := TJSONObject.ParseJSONValue(AData) as TJSONObject;
+  try
+    AIndex := StrToIntDef(AJson.GetValue('index').Value, -1);
+    ASubIndex := -1;
+    if AJson.GetValue('sub-index') <> nil then
+      ASubIndex := StrToIntDef(AJson.GetValue('sub-index').Value, -1);
+    if Assigned(FOnItemClick) then
+      FOnItemClick(Self, FItems[AIndex], ASubIndex);
+  finally
+    AJson.Free;
+  end;
+end;
+
+procedure TEWNavBar.GetEventListners(AListners: TStrings);
+var
+  AItem: TCollectionItem;
+  ICount: integer;
+begin
+  inherited;
+  if Assigned(FOnBrandClick) then
+    AddObjectEvent(Name+'Brand', 'click', [], AListners, '');
+
+  for AItem in FItems do
+  begin
+    // first add the nav item click...
+    AddObjectEvent(Name+'Item'+AItem.Index.ToString, 'click', ['index='+AItem.Index.ToString], AListners, '');
+
+    // now any drop-down menu item clicks...
+    for ICount := 0 to TEWNavBarItem(AItem).DropdownItems.Count-1 do
+    begin
+      AddObjectEvent(Name+'Item'+AItem.ID.ToString+'_SubItem'+ICount.ToString,
+                     'click',
+                     ['index='+AItem.Index.ToString, 'sub-index='+ICount.ToString],
+                     AListners, '');
+    end;
+  end;
+end;
+
+function TEWNavBar.GetHtml: string;
+var
+  AItem: TCollectionItem;
+begin
+  inherited;
+  Result := '<nav id="'+Name+'" class="navbar navbar-expand-sm '+GetStyleClass+'">'+
+  '<a id="'+Name+'Brand'+'" class="navbar-brand" href="#">'+FTitle+'</a>'+
+  '<ul class="navbar-nav">';
+
+  for AItem in Fitems do
+    Result :=Result + TEWNavBarItem(AItem).GetHtml;
+
+  Result := Result + '</ul></nav>';
+end;
+
+function TEWNavBar.GetStyleClass: string;
+begin
+  case FStyle of
+    nbsDefault: Result := '';
+    nbsLight: Result := 'navbar-light';
+    nbsPrimary: Result := 'navbar-dark bg-primary';
+    nbsDark: Result := 'navbar-dark bg-dark';
+  end;
+end;
+
+procedure TEWNavBar.Paint;
+var
+  r: TRect;
+  t: TRect;
+  s: string;
+  ICount: Integer;
+  ALastFont: string;
+  AFontColor: TColor;
+  ABackground: TColor;
+begin
+  r := ClientRect;
+  ABackground := clNone;
+  AFontColor := clBlack;
+  case FStyle of
+    nbsDefault: ABackground := clNone;
+    nbsLight: ABackground := clNone;
+    nbsPrimary: ABackground := clWebDodgerBlue;
+    nbsDark: ABackground := clDkGray;
+  end;
+
+  case FStyle of
+    nbsDefault: AFontColor := clWebDodgerBlue;
+    nbsLight: AFontColor := clGray;
+    nbsPrimary: AFontColor := clWhite;
+    nbsDark: AFontColor := clWhite;
+  end;
+
+  Canvas.Font.Color := AFontColor;
+  Canvas.Brush.Color := ABackground;
+
+  if ABackground = clNone then
+    Canvas.Brush.Style := bsClear;
+
+  Canvas.FillRect(r);
+
+  Canvas.Brush.Style := bsClear;
+
+  canvas.Font.Size := 14;
+  t := Rect(0, 0, Canvas.TextWidth(FTitle)+16, Height);
+
+  Canvas.TextRect(t, FTitle, [tfSingleLine, tfVerticalCenter, tfCenter]);
+  OffsetRect(t, t.Width, 0);
+
+  canvas.Font.Size := 10;
+  for ICount := 0 to FItems.Count-1 do
+  begin
+    s := FItems[ICount].Text;
+    t.Width := Canvas.TextWidth(s)+32;
+    Canvas.TextRect(t, s, [tfSingleLine, tfVerticalCenter, tfCenter]);
+    if FItems[ICount].FDropdownItems.Count > 0 then
+    begin
+      r := t;
+      r.Left := r.Right-16;
+      ALastFont := Canvas.Font.Name;
+      Canvas.Font.Name := 'Webdings';
+
+      s := '6';
+      Canvas.TextRect(r, s, [tfSingleLine, tfVerticalCenter, tfCenter]);
+      Canvas.Font.Name := ALastFont;
+    end;
+    OffsetRect(t, t.Width, 0);
+  end;
+end;
+
+procedure TEWNavBar.SetItems(const Value: TEWNavBarItemCollection);
+begin
+  FItems.Assign(Value);
+end;
+
+procedure TEWNavBar.SetStyle(const Value: TEWNavBarStyle);
+begin
+  if FStyle <> Value then
+  begin
+    FStyle := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWNavBar.SetTitle(const Value: string);
+begin
+  if FTitle <> Value then
+  begin
+    FTitle := Value;
+    Changed;
+  end;
+end;
+
+{ TEWNavBarItem }
+
+procedure TEWNavBarItem.Assign(Source: TPersistent);
+begin
+  inherited;
+  if (Source is TEWNavBarItem) then
+  begin
+    //ID := (Source as TEWNavBarItem).ID;
+    Text := (Source as TEWNavBarItem).Text;
+    Changed;
+  end;
+end;
+
+procedure TEWNavBarItem.Changed;
+begin
+  FNavBar.Changed;
+end;
+
+constructor TEWNavBarItem.Create(Collection: TCollection);
+begin
+  inherited Create(Collection);
+  FDropdownItems := TStringList.Create;
+  FNavBar := (Collection as TEWNavBarItemCollection).FNavBar;
+end;
+
+
+function TEWNavBarItem.GetHtml: string;
+var
+  ICount: integer;
+  AItem: string;
+begin
+  if FDropdownItems.Count > 0 then
+  begin
+    Result := '<li class="nav-item dropdown">'+
+              '<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">'+
+              FText+
+              '</a>'+
+              '<div class="dropdown-menu">';
+    for ICount := 0 to FDropdownItems.Count-1 do
+    begin
+      AItem := FDropdownItems[ICount];
+      Result := Result + '<a id="'+FNavBar.Name+'Item'+ID.ToString+'_SubItem'+ICount.ToString+'" class="dropdown-item" href="#">'+AItem+'</a>';
+    end;
+    Result := Result + '</div></li>';
+  end
+  else
+    Result := '<li class="nav-item"><a id="'+FNavBar.Name+'Item'+ID.ToString+'" class="nav-link" href="#">'+FText+'</a></li>'
+end;
+
+procedure TEWNavBarItem.SetDropDownItems(const Value: TStrings);
+begin
+  FDropdownItems.Assign(Value);
+  Changed;
+end;
+
+procedure TEWNavBarItem.SetText(const Value: string);
+begin
+  if FText <> Value then
+  begin
+    FText := Value;
+    Changed;
+  end;
+end;
+
+{ TEWNavBarItemCollection }
+
+function TEWNavBarItemCollection.Add: TEWNavBarItem;
+begin
+  Result := TEWNavBarItem.Create(Self);
+end;
+
+constructor TEWNavBarItemCollection.Create(ANavBar: TEWNavBar);
+begin
+  inherited Create(TEWNavBarItem);
+  FNavBar := ANavBar;
+end;
+
+function TEWNavBarItemCollection.GetItem(Index: Integer): TEWNavBarItem;
+begin
+  Result := inherited Items[index] as TEWNavBarItem;
+end;
+
+function TEWNavBarItemCollection.GetOwner: TPersistent;
+begin
+  Result := FNavBar;
+end;
+
+function TEWNavBarItemCollection.Insert(Index: Integer): TEWNavBarItem;
+begin
+  Result := inherited insert( index ) as TEWNavBarItem;
+end;
+
+procedure TEWNavBarItemCollection.SetItem(Index: Integer;
+  Value: TEWNavBarItem);
+begin
+  inherited SetItem(index, Value);
+end;
+
+end.
