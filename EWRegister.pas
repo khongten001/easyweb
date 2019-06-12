@@ -24,7 +24,8 @@ uses
   EWImages,
   EWTimer,
   EWTypes,
-  EWSpacer;
+  EWLayout,
+  EWNavBar;
 
 type
   TEWFontFamilyList = class(TStringProperty)
@@ -49,8 +50,9 @@ begin
   RegisterComponents('EasyWeb', [TEWCheckBox]);
   RegisterComponents('EasyWeb', [TEWLabel]);
   RegisterComponents('EasyWeb', [TEWImage]);
-  RegisterComponents('EasyWeb', [TEWSpacer]);
+  RegisterComponents('EasyWeb', [TEWLayout]);
   RegisterComponents('EasyWeb', [TEWTimer]);
+  RegisterComponents('EasyWeb', [TEWNavBar]);
   RegisterPropertyEditor(TypeInfo(string), TEWFont, 'Family', TEWFontFamilyList);
 
 end;

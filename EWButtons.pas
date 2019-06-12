@@ -17,7 +17,6 @@ type
     procedure SetText(const Value: string);
     procedure SetBorderRadius(const Value: integer);
   protected
-    procedure GetEventListners(AListners: TStrings); override;
     function GetHtml: string; override;
     function DesignTimeCaption: string; override;
     procedure Paint; override;
@@ -25,12 +24,13 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property Align;
     property ButtonType: TewButtonType read GetButtonType write SetButtonType default btSecondary;
     property Text: string read GetText write SetText;
     property BorderRadius: integer read FBorderRadius write SetBorderRadius default 0;
   end;
 
-  TEWDropDown = class(TewButton, IEWBaseObjectItemClickable)
+  TEWDropDown = class(TEWButton, IEWBaseObjectItemClickable)
   private
     FItems: TStrings;
     FItemIndex: integer;
@@ -43,11 +43,13 @@ type
     procedure SetItemIndex(Value: integer);
     procedure OnItemsChanged(Sender: TObject);
   protected
+
     procedure GetEventListners(AListners: TStrings); override;
     function GetHtml: string; override;
     procedure BuildCss(AProperties: TStrings); override;
     property ItemIndex: integer read GetItemIndex write SetItemIndex;
-    procedure DoItemClick(ASender: TObject; AItem: string; AIndex: integer);
+    procedure DoEvent(AParams: TStrings); override;
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -68,8 +70,8 @@ type
     function GetItemIndex: integer;
     procedure SetItemIndex(Value: integer);
   protected
+    procedure DoClick(AParams: TStrings); override;
     function GetHtml: string; override;
-    procedure BuildCss(AProperties: TStrings); override;
     procedure DoItemClick(ASender: TObject; AItem: string; AIndex: integer);
     procedure GetEventListners(AListners: TStrings); override;
   public
@@ -83,7 +85,7 @@ type
 
 implementation
 
-uses Types, Graphics, SysUtils;
+uses Types, VCL.Graphics, SysUtils;
 
 
 { TEWButton }
@@ -92,7 +94,6 @@ procedure TEWButton.BuildCss(AProperties: TStrings);
 begin
   inherited;
   if FBorderRadius > 0 then AProperties.Values['corner-radius'] := BorderRadius.ToString+'px';
-
 end;
 
 constructor TEWButton.Create(AOwner: TComponent);
@@ -126,11 +127,6 @@ begin
     btDark:       Result := 'btn btn-dark';
     btLink:       Result := 'btn btn-link';
   end;
-end;
-
-procedure TEWButton.GetEventListners(AListners: TStrings);
-begin
-  inherited;
 end;
 
 function TEWButton.GetHtml: string;
@@ -237,11 +233,16 @@ begin
   inherited;
 end;
 
-procedure TEWDropDown.DoItemClick(ASender: TObject; AItem: string;
-  AIndex: integer);
+procedure TEWDropDown.DoEvent(AParams: TStrings);
+var
+  AIndex: integer;
 begin
+  inherited;
   if Assigned(FOnItemClick) then
-    FOnItemClick(ASender, AItem, AIndex);
+  begin
+    AIndex := StrToInt(AParams.Values['index']);
+    FOnItemClick(Self, FItems[AIndex], AIndex);
+  end;
 end;
 
 procedure TEWDropDown.GetEventListners(AListners: TStrings);
@@ -252,7 +253,7 @@ begin
   if Assigned(FOnItemClick) then
   begin
     for ICount := 0 to FItems.Count-1 do
-      AddClickItemEvent(ICount, AListners);
+      AddObjectEvent(Name+'Item'+ICount.ToString, 'click', ['index='+ICount.ToString], AListners, '');
   end;
 end;
 
@@ -261,13 +262,13 @@ var
   ICount: integer;
 begin
   inherited;
-  Result := '<div id="'+Name+'" '+GetCss+'><button class="' +
+  Result := '<div id="'+Name+'" '+GetCss+'button class="' +
     GetButtonTypeStr +
     ' dropdown-toggle" style="width:100%;height:100%;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
     + '  ' + Text + '</button>'+
     '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
   for ICount := 0 to FItems.Count - 1 do
-    Result := Result + '<a class="dropdown-item" id="'+Name+'-'+ICount.ToString+'" href="#">' + FItems[ICount] + '</a>';
+    Result := Result + '<a class="dropdown-item" id="'+Name+'Item'+ICount.ToString+'" href="#">' + FItems[ICount] + '</a>';
   Result := Result + '</div></div>';
 end;
 
@@ -309,11 +310,7 @@ end;
 
 { TEWButtonGroup }
 
-procedure TEWButtonGroup.BuildCss(AProperties: TStrings);
-begin
-  inherited;
-  AProperties.Values['display'] := 'flex';
-end;
+
 
 constructor TEWButtonGroup.Create(AOwner: TComponent);
 begin
@@ -327,13 +324,29 @@ begin
   inherited;
 end;
 
-procedure TEWButtonGroup.DoItemClick(ASender: TObject; AItem: string;
-  AIndex: integer);
+procedure TEWButtonGroup.DoClick(AParams: TStrings);
+var
+  AIndex: integer;
 begin
-  if FItemIndex <> AIndex then
+  inherited;
+  AIndex := StrToIntDef(AParams.Values['index'], -1);
+  if AIndex <> FItemIndex then
   begin
     FItemIndex := AIndex;
     Changed;
+  end;
+  if (AIndex >= 0) and (Assigned(FOnItemClick)) then
+    FOnItemClick(Self, Items[AIndex], AIndex);
+
+end;
+
+procedure TEWButtonGroup.DoItemClick(ASender: TObject; AItem: string;
+  AIndex: integer);
+begin
+  FItemIndex := AIndex;
+  Changed;
+  if FItemIndex <> AIndex then
+  begin
     if Assigned(FOnItemClick) then
       FOnItemClick(ASender, AItem, AIndex);
   end;
@@ -344,11 +357,9 @@ var
   ICount: integer;
 begin
   inherited;
-  if Assigned(FOnItemClick) then
-  begin
-    for ICount := 0 to FItems.Count-1 do
-      AddClickItemEvent(ICount, AListners);
-  end;
+  for ICount := 0 to FItems.Count-1 do
+    AddObjectEvent(Name+'Item'+ICount.ToString, 'click', ['index='+ICount.ToString], AListners, '');
+    //AddClickItemEvent(ICount, AListners);
 end;
 
 function TEWButtonGroup.GetHtml: string;
@@ -357,16 +368,16 @@ var
   AActive: string;
 begin
   inherited;
-  Result := #13#10+'<div ' + GetCss +
-    #13#10+' id="'+Name+'" name="'+Name+'" class="btn-group" role="group" aria-label="Basic example">';
+  Result :='<div ' + GetCss +' id="'+Name+'" style="width:100%;height:100%;" class="btn-group" role="group" aria-label="Basic example">';
   for ICount := 0 to FItems.Count - 1 do
   begin
     AActive := '';
     if ICount = FItemIndex then
       AActive := ' active ';
-    Result := Result + #13#10+'  <button type="button" id="'+Name+'-'+ICount.ToString+'" style="flex:1;box-shadow: none" class="' + GetButtonTypeStr + ''+ AActive +'">' + FItems[ICount] +'</button>';
+    Result := Result + #13#10+'  <button type="button" id="'+Name+'Item'+ICount.ToString+'" style="flex:1;box-shadow: none" class="' + GetButtonTypeStr + ''+ AActive +'">' + FItems[ICount] +'</button>';
   end;
-  Result := Result + #13#10+'</div>';
+
+  Result := Result + '</div>';
 end;
 
 function TEWButtonGroup.GetItemIndex: integer;

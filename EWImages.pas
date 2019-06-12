@@ -2,7 +2,7 @@ unit EWImages;
 
 interface
 
-uses Windows,Classes, EWIntf, EWBase, EWTypes, Graphics;
+uses Windows, Classes, EWIntf, EWBase, EWTypes, VCL.Graphics;
 
 type
   TEWImage = class(TEWBaseObject, IEWImage)
@@ -20,10 +20,12 @@ type
     function GetHtml: string; override;
     procedure Paint; override;
     function GetPreloadUrl: string;
+    procedure BuildCss(AProperties: TStrings); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
+    property Align;
     property ImageShape: TEWImageShape read FImageShape write SetImageShape default isDefault;
     property Picture: TPicture read FPicture write SetPicture;
     property URL: string read FUrl write SetUrl;
@@ -35,6 +37,11 @@ uses Types, SysUtils;
 
 { TEWImage }
 
+
+procedure TEWImage.BuildCss(AProperties: TStrings);
+begin
+  inherited;
+end;
 
 procedure TEWImage.Changed;
 begin
@@ -75,12 +82,12 @@ begin
   if Assigned(FPicture.Graphic) then
   begin
     if FPicture.Graphic.Empty = False then
-     ASrc := 'http://localhost:8080/images?s='+SessionID+'&img='+Name+'&ts='+FTimeStamp.ToString;
+     ASrc := '/images?s='+SessionID+'&img='+Name+'&ts='+FTimeStamp.ToString;
 
   end;
   Result := '';
-  Result := '<div '+GetCss+'><img style="width:100%;height:auto;" id="'+Name+'" name="'+Name+'" rel="prefetch" '+
-            'class= "'+GetClass+'" src="'+ASrc+'"></img></div>';
+  Result := '<img  id="'+Name+'" '+GetCss+' style="width:100%;height:auto;"  rel="prefetch" '+
+            'class= "'+GetClass+'" src="'+ASrc+'">';
 end;
 
 function TEWImage.GetPreloadUrl: string;

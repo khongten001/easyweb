@@ -22,6 +22,7 @@ type
     EWCheckBox1: TEWCheckBox;
     EWLabel6: TEWLabel;
     EWButton3: TEWButton;
+    EWEdit1: TEWEdit;
     procedure EWDropDown1ItemClick(Sender: TObject; AItem: string;
       AIndex: Integer);
     procedure EWImage1MouseEnter(Sender: TObject);

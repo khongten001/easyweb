@@ -13,3 +13,7 @@
 /Demos/Basic/*.res
 /Demos/Basic/*.stat
 /Demos/Basic/__history/*.~1~
+/Demos/Grid/Win32/Debug
+/Demos/NavBar/Win32/Debug
+/Demos/NavBar/__history
+/Demos/Basic/__history

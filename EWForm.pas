@@ -3,8 +3,8 @@ unit EWForm;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Graphics,
-  Controls, Forms, Dialogs, EWBase, EWSession, EWIntf, EWTypes;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, VCL.Graphics,
+  VCL.Controls, VCL.Forms, EWBase, EWSession, EWIntf, EWTypes;
 
 type
   TEWForm = class;
@@ -37,6 +37,7 @@ type
     property Session: TewSession read GetSession write SetSession;
   published
     property Caption;
+    property Color default clwhite;
     property ExtraMeta: TStrings read FExtraMeta write SetExtraMeta;
     property ExtraScript: TStrings read FExtraScript write SetExtraScript;
     property JavascriptIncludes: TStrings read FJavascriptIncludes write SetJavascriptIncludes;
@@ -50,7 +51,10 @@ type
 
 implementation
 
-uses EWServerControllerBase, EWConst;
+uses EWServerControllerBase, EWConst, System.Generics.Collections, System.Generics.Defaults;
+
+type
+  TEWBaseObjectList = TObjectList<TewBaseObject>;
 
 {$R *.dfm}
 
@@ -60,6 +64,7 @@ begin
   FExtraMeta := TStringList.Create;
   FExtraScript := TStringList.Create;
   FJavascriptIncludes := TStringList.Create;
+  Color := clWhite;
 end;
 
 destructor TEWForm.Destroy;
@@ -76,6 +81,23 @@ begin
 end;
 
 function TEWForm.GetHtml: string;
+
+ { function SortObjects(const L, R: TewBaseObject): integer;
+  begin
+     if l.Top > r.Top then
+      Result := 1
+     else
+      Result := -1;
+
+     if l.top = r.Top then
+     begin
+       if l.Left > r.Left then
+        Result := 1
+       else
+        Result := -1;
+     end;
+  end;   }
+
 var
   c: IEWBaseComponent;
   i: IEWBaseVisualObject;
@@ -83,7 +105,6 @@ var
   AListners: TStrings;
   AIncludes: TStrings;
   AGlobals: TStrings;
-  //ACss: TStrings;
 begin
   AListners := TStringList.Create;
   AIncludes := TStringList.Create;
@@ -108,7 +129,7 @@ begin
     end;
 
     Result := '<!DOCTYPE html>'+CR+
-              '<html id="'+Self.Name+'" lang="en">'+CR+
+              '<html>'+CR+
               '<head>'+CR+
               '<title>'+Caption+'</title>'+CR+
               '<meta charset="utf-8">'+CR+
@@ -118,68 +139,38 @@ begin
               '<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>'+CR+
               '<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>'+CR+
               '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>'+CR+
+              '<script type="text/javascript" src="/EWCore.js"></script>'+CR+
               Trim(AIncludes.Text)+CR+
               '<style>'+CR+
-              //Trim(ACss.Text)+#13#10+
               '</style>'+CR+
               '<script>'+CR+
               Trim(Trim(AGlobals.Text)+CR+
               Trim(AListners.Text))+CR+
               CR+
-              'function getQueryStringValue (key) '+CR+
-              '{'+CR+
-              '  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));'+CR+
-              '}'+CR+CR+
-              'function httpGet(theUrl)'+CR+
-              '{'+CR+
-              '  var xmlHttp = new XMLHttpRequest();'+CR+
-              '  xmlHttp.open( "GET", theUrl, false); '+CR+
-              '  xmlHttp.send( null );'+CR+
-              '  return xmlHttp.responseText;'+CR+
-              '} '+CR+CR+
 
-              'function asyncEvent(aaction, aname, avalue)'+CR+
-              '{'+CR+
-              '  var url = "http://localhost:8080?async=T&session="+getQueryStringValue("session")+"&action="+aaction+"&name="+aname+"&value="+avalue; '+CR+
-              '  var response = httpGet(url);'+CR+
-              '  if (response=="reload") '+CR+
-              '  {'+CR+
-              '    location.reload();'+CR+
-              '    Exit;' +CR+
-              '  }'+CR+
-              '  var ajson = JSON.parse(response); '+CR+
-              '  ajson.forEach(function(element) {'+CR+
-              '  document.getElementById(element.name).outerHTML = element.html;'+CR+
-              '  if (element.script != "") {eval(element.script);}; '+CR+
-              '  });'+CR+
-              '};'+CR+CR+
-
-              'function asyncKeypress(aname, avalue)'+CR+
-              '{'+CR+
-              '  var url = "http://localhost:8080?async=T&session="+getQueryStringValue("session")+"&action=keypress&name="+aname+"&value="+avalue; '+CR+
-              '  var response = httpGet(url);'+CR+
-              '  alert(element.html); '+CR+
-              '  var ajson = JSON.parse(response); '+CR+
-              '  ajson.forEach(function(element) {'+CR+
-              '  document.getElementById(element.name).outerHTML = element.html;'+CR+
-
-              '  });'+CR+
-
-              '};'+CR+
               FExtraScript.Text+CR+
+
+
               '</script>'+CR+
 
               '</head>'+CR+
               '<body>';
 
-    for ICount := 0 to ComponentCount-1 do
-    begin
-      if Supports(Self.Components[ICount], IewBaseComponent, i) then
+
+
+      for ICount := 0 to ComponentCount-1 do
       begin
-        Result := Result + IewBaseComponent(i).Html +CR;
+        if Self.Components[ICount] is TEWBaseComponent then
+            Result := Result + TEWBaseComponent(Self.Components[ICount] ).Html +CR;
+
+        if Self.Components[ICount] is TEWBaseObject then
+        begin
+          //AList.Add(Self.Components[ICount] as TEWBaseObject)
+          if TewBaseObject(Self.Components[ICount] ).Parent = Self then
+            Result := Result + TEWBaseObject(Self.Components[ICount] ).Html +CR;
+        end;
       end;
-      //if Supports(Self.Components[ICount], IewBaseObject, i) then Result := Result + i.Html;
-    end;
+
     Result := Result +CR+
               '</body>'+CR+
             '</html>';

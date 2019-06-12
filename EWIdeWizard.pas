@@ -56,6 +56,7 @@ type
 implementation
 
 uses
+  EWConst,
   {$WARNiNGS OFF}
   ExptIntf,
   {$WARNINGS ON}
@@ -208,8 +209,9 @@ begin
 'uses  '+#13#10+
 '  System.SysUtils, System.Classes, EWServerControllerBase, IdContext, '+#13#10+
 '  IdCustomHTTPServer, IdBaseComponent, IdComponent, IdCustomTCPServer,'+#13#10+
-'  IdHTTPServer, ewBase;'+#13+
-#13#10+
+'  IdHTTPServer, ewBase;'+CR+CR+
+
+
 'type  '+#13#10+
 '  TEWServerController = class(TewBaseServerController) '+#13#10+
 '  private  '+#13#10+
@@ -223,8 +225,8 @@ begin
 
 
 'implementation'+#13#10+
-#13#10+
-
+CR+
+'{%CLASSGROUP ''Vcl.Controls.TControl''}'+CR+CR+
 '{$R *.dfm}'+#13#10+
 #13#10+#13#10+
 'initialization'+#13#10+#13#10+

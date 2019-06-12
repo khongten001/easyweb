@@ -2,7 +2,7 @@ unit EWSession;
 
 interface
 
-uses Classes, Forms, System.Generics.Collections, EWBase;
+uses Classes, VCL.Forms, System.Generics.Collections, EWBase;
 
 type
   TEWSession = class
@@ -34,9 +34,6 @@ type
     function AddSession(ASessionID: string): TEWSession;
     property SessionByID[ASessionID: string]: TEWSession read GetSessionByID;
   end;
-
-
-
 
 
 implementation

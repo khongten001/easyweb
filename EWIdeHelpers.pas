@@ -10,17 +10,21 @@ type
     IOTARepositoryWizard,
     IOTARepositoryWizard60,
     IOTARepositoryWizard80,
+    IOTARepositoryWizard160,
     IOTAWizard)
   protected
     function GetIDString: string; virtual;
     function GetName: string; virtual; abstract;
     function GetState: TWizardState;
     procedure Execute; virtual; abstract;
+
     function GetAuthor: string;
     function GetComment: string; virtual;
     function GetGlyph: Cardinal; virtual;
     function GetPage: string;
     function GetDesigner: string;
+    function GetFrameworkTypes: TArray<string>;
+    function GetPlatforms: TArray<string>;
     function GetGalleryCategory: IOTAGalleryCategory; virtual;
     function GetPersonality: string; virtual;
     property GalleryCategory: IOTAGalleryCategory read GetGalleryCategory;
@@ -66,6 +70,7 @@ type
     IOTAProjectCreator50,
     IOTAProjectCreator80,
     IOTAProjectCreator160,
+    IOTAProjectCreator190,
     IOTAProjectCreator)
   protected
     function GetOwner: IOTAModule; override;
@@ -80,6 +85,7 @@ type
     function GetProjectPersonality: string;
     function GetFrameworkType: string;
     function GetPlatforms: TArray<string>;
+    function GetSupportedPlatforms: TArray<string>;
     function GetPreferredPlatform: string;
     procedure SetInitialOptions(const NewProject: IOTAProject);
   end;
@@ -132,6 +138,11 @@ begin
   Result := dVCL;
 end;
 
+function TEWBaseWizard.GetFrameworkTypes: TArray<string>;
+begin
+  Result := TArray<string>.Create(sFrameworkTypeVCL);
+end;
+
 function  TEWBaseWizard.GetGalleryCategory: IOTAGalleryCategory;
 begin
   result := nil;
@@ -140,6 +151,11 @@ end;
 function  TEWBaseWizard.GetPersonality: string;
 begin
   result :=  sDelphiPersonality;
+end;
+
+function TEWBaseWizard.GetPlatforms: TArray<string>;
+begin
+  Result := TArray<string>.Create(cWin32Platform, cWin64Platform);
 end;
 
 { TEWBaseCreator }
@@ -272,6 +288,11 @@ begin
   Result := True;
 end;
 
+function TEWBaseProjectCreator.GetSupportedPlatforms: TArray<string>;
+begin
+  Result := TArray<string>.Create(cWin32Platform, cWin64Platform);
+end;
+
 function TEWBaseProjectCreator.NewOptionSource(const ProjectName: string): IOTAFile;
 begin
   Result := nil;
@@ -279,7 +300,7 @@ end;
 
 function TEWBaseProjectCreator.NewProjectSource(const ProjectName: string): IOTAFile;
 begin
-  Result := nil; // Default project source
+  Result := nil;
 end;
 
 procedure TEWBaseProjectCreator.NewDefaultModule;
@@ -312,9 +333,6 @@ end;
 function TEWBaseProjectCreator.GetPlatforms: TArray<string>;
 begin
   Result := TArray<string>.Create(cWin32Platform, cWin64Platform);
-  {SetLength(Result, 2);
-  Result[0] := cWin32Platform;
-  Result[1] := cWin64Platform;;}
 end;
 
 function TEWBaseProjectCreator.GetPreferredPlatform: string;

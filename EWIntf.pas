@@ -16,6 +16,9 @@ type
 
   IEWBaseComponent = interface
     ['{9097EA58-A758-4100-BF04-B4AA2F42AA7B}']
+
+    procedure DoEvent(AParams: TStrings);
+
     function GetName: string;
     function GetHasChanged: Boolean;
     function GetScript: string;
@@ -29,7 +32,8 @@ type
 
   IEWBaseVisualObject = interface
     ['{C55735AD-4A52-4E28-9F0B-DB1BDEC998A4}']
-    function CssCommaText: string;
+    //function CssCommaText: string;
+
     procedure GetEventListners(AListners: TStrings);
     procedure GetGlobalVars(AStrings: TStrings);
     procedure DoMouseEnter(AParams: TStrings);
@@ -38,14 +42,13 @@ type
     procedure DoRightClick(AParams: TStrings);
     procedure DoDblClick(AParams: TStrings);
     procedure DoOnChange(AParams: TStrings);
-
   end;
 
   IEWBaseObjectItemClickable = interface
     ['{8FB82898-F12F-42E0-849F-F5A7666D2C8C}']
     function GetItems: TStrings;
     function GetItemIndex: integer;
-    procedure DoItemClick(ASender: TObject; AItem: string; AIndex: integer);
+
     procedure SetItems(const Value: TStrings);
     procedure SetItemIndex(Value: integer);
     property Items: TStrings read GetItems write SetItems;
@@ -121,13 +124,18 @@ type
     ['{EB70D8DD-3838-4A74-982D-3C0CF6E1F172}']
   end;
 
-  IEWSpacer = interface
+  IEWLayout = interface
     ['{94056032-0A61-443A-A354-94668A118032}']
   end;
 
   IEWTimer = interface
     ['{A694881C-5FD0-458E-9964-23E5B3D2CD40}']
     procedure DoTimer;
+  end;
+
+  IEWNavBar = interface
+    ['{2EE70962-FAF0-4952-98CC-E9AAB88975BC}']
+    procedure DoItemClick(ASender: TObject; AData: string);
   end;
 
 

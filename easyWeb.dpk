@@ -52,6 +52,7 @@ contains
   EWStartup in 'EWStartup.pas' {frmStartup},
   EWTimer in 'EWTimer.pas',
   EWTypes in 'EWTypes.pas',
-  EWSpacer in 'EWSpacer.pas';
+  EWLayout in 'EWLayout.pas',
+  EWNavBar in 'EWNavBar.pas';
 
 end.

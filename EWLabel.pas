@@ -2,7 +2,7 @@ unit EWLabel;
 
 interface
 
-uses Classes, EWIntf, EWBase, Graphics, EWTypes;
+uses Classes, EWIntf, EWBase, VCL.Graphics, EWTypes;
 
 type
   TEWLabel = class(TEWBaseObject, IEWLabel)
@@ -27,6 +27,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
+    property Align;
     property BackgroundColor: TColor read FBackgroundColor write SetBackgroundColor default clNone;
     property Alignment: TAlignment read FAlignment write SetAlignment default taLeftJustify;
     property Font: TEWFont read FFont write SetFont;
@@ -38,7 +39,7 @@ implementation
 
 uses Types, SysUtils;
 
-{ TBsLabel }
+{ TEWLabel }
 
 procedure TEWLabel.BuildCss(AProperties: TStrings);
 begin
@@ -87,8 +88,7 @@ begin
     taVerticalCenter: ATranslate := '50%';
     taAlignBottom: ATranslate := '100%';
   end;
-  Result := '<div class="'+Name+'" id="'+Name+'" '+GetCss+'><div style="position: relative; top: '+IntToStr(Height div 2)+'px; transform: translateY(-'+ATranslate+')">'+FText+'</div></div>';
-  //Result := '<div class="'+Name+'" id="'+Name+'"><div style=";position: relative;top: '+ATranslate+';transform: translateY(-'+ATranslate+')">'+FText+'</div><div>';
+  Result := '<div id="'+Name+'" '+GetCss+' style="position: relative; top: '+IntToStr(Height div 2)+'px; transform: translateY(-'+ATranslate+')">'+FText+'</div>';
 end;
 
 function TEWLabel.GetText: string;

@@ -1,11 +1,11 @@
-unit EWSpacer;
+unit EWLayout;
 
 interface
 
 uses Classes, EWIntf, EWBase, Graphics, EWTypes;
 
 type
-  TEWSpacer = class(TEWBaseObject, IEWSpacer)
+  TEWLayout = class(TEWBaseObject, IEWSpacer)
   protected
     function DesignTimeCaption: string; override;
     function GetHtml: string; override;
@@ -17,17 +17,25 @@ uses Types, SysUtils;
 
 { TBsLabel }
 
-function TEWSpacer.DesignTimeCaption: string;
+function TEWLayout.DesignTimeCaption: string;
 begin
   inherited;
   Result := '';
 end;
 
 
-function TEWSpacer.GetHtml: string;
+function TEWLayout.GetHtml: string;
+var
+  ICount: integer;
 begin
   inherited;
-  Result := '<div class="'+Name+'" id="'+Name+'" '+GetCss+'></div>';
+  Result := '<div id="'+Name+'" '+GetCss+'>';
+  for ICount := 0 to ControlCount-1 do
+  begin
+
+  end;
+
+  Result := Reuslt + '</div>';
 end;
 
 end.

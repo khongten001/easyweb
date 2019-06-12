@@ -655,4 +655,11 @@ object Form1: TForm1
     ButtonType = btInfo
     Text = 'Open Second Form'
   end
+  object EWEdit1: TEWEdit
+    Left = 280
+    Top = 25
+    Width = 100
+    Height = 41
+    Text = ''
+  end
 end

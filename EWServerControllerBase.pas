@@ -13,10 +13,13 @@ type
     FHttpServer: TIdHTTPServer;
     FPort: integer;
     FBytesSent: integer;
+    function GetCoreJs: string;
     procedure ExecuteGetCmd(AContext: TIdContext;
   ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+
     procedure SetPort(const Value: integer);
     procedure ServeImage(ASessionID, AImage: string; AResponseInfo: TIdHTTPResponseInfo);
+
     { Private declarations }
   protected
     class procedure Initialize;
@@ -41,14 +44,13 @@ var
   GlobalServerController: TEWBaseServerController;
   EWMainFormClass: TEWFormClass;
 
-
-  //
-  //TbsBaseServerController
 implementation
 
-uses Forms, Json, EWBase, EWIntf, Dialogs, EWImages, PngImage, Jpeg, GifImg;
-
 {%CLASSGROUP 'Vcl.Controls.TControl'}
+
+uses VCL.Forms, Json, System.Generics.Collections, EWBase, EWIntf, EWImages, VCL.Imaging.PngImage,
+  VCL.Imaging.Jpeg, VCL.Imaging.GifImg, EWConst;
+
 
 {$R *.dfm}
 
@@ -124,20 +126,31 @@ var
   ASession: TewSession;
   c: TComponent;
   aaction: string;
-  i: IEWBaseComponent;
+  AIntf: IEWBaseComponent;
   AName: string;
-  AItem: string;
   AValue: string;
   AHtml: string;
   ICount: integer;
-  AJson: TJsonArray;
+  AChanges: TJsonArray;
   AObj: TJsonObject;
   AParams: TStrings;
   ABytes: integer;
+  AData: string;
+  AJSon: TJSonObject;
+  AEventParams: TStrings;
 begin
   try
     if Pos('favicon', ARequestInfo.URI) > 0 then
       exit;
+
+    if Pos('/ewcore.js', ARequestInfo.URI.ToLower) = 1 then
+    begin
+      AResponseInfo.ContentType := 'text/javascript';
+      AResponseInfo.ContentText := GetCoreJs;
+      Exit;
+    end;
+
+
     ASession := nil;
 
     AParams := ARequestInfo.Params;
@@ -159,8 +172,9 @@ begin
 
 
     aaction := ARequestInfo.Params.Values['action'];
-
+    AData := ARequestInfo.Params.Values['data'];
     if ASession = nil then s := '';
+
 
     if (ASession <> nil) and (ASession.SelectedForm <> nil) then
     begin
@@ -168,43 +182,49 @@ begin
       AName := GetStrBefore('-', AName);
       AValue := ARequestInfo.Params.Values['value'];
 
+      if AData <> '' then
+      begin
+        AJson := TJSONObject.ParseJSONValue(AData) as TJSONObject;
+        AName := AJson.GetValue('name').Value;
+
+      end;
+
       c := TForm(ASession.SelectedForm).FindComponent(AName);
-      //c := AForm.FindComponent(AName);
-      //c := FindEwComponent(AForm, AName);
       if c <> nil then
       begin
-        //TThread.Synchronize(nil,
-        //  procedure
-          //begin
-          if Supports(c, IEWTimer, i) then
-
-            if (aaction = 'timer') then
-            begin
-              IEWTimer(i).DoTimer;
-            end;
-
-
-          if Supports(c, IEWBaseVisualObject, i) then
+        TThread.Synchronize(nil,
+          procedure
+          var
+            i: integer;
           begin
-            if (aaction = 'mouseenter') then (i as IEWBaseVisualObject).DoMouseEnter(AParams);
-            if (aaction = 'mouseleave') then (i as IEWBaseVisualObject).DoMouseLeave(AParams);
-            if (aaction = 'click') then (i as IEWBaseVisualObject).DoClick(AParams);
-            if (aaction = 'rightclick') then (i as IEWBaseVisualObject).DoRightClick(AParams);
-            if (aaction = 'dblclick') then (i as IEWBaseVisualObject).DoDblClick(AParams);
-            if (aaction = 'clickitem') and (Supports(c, IewBaseObjectItemClickable, i)) then
-            begin
-              AItem := IewBaseObjectItemClickable(i).Items[StrToIntDef(AValue, -1)];
-              IewBaseObjectItemClickable(i).DoItemClick(c, AItem, StrToIntDef(AValue, -1));
+            AEventParams := TStringList.Create;
+            try
+              if AJson <> nil then
+              begin
+                for i := 0 to AJSon.Count-1 do
+                  AEventParams.Values[AJSon.Pairs[i].JsonString.Value] := AJSon.Pairs[i].JsonValue.Value;
+              end;
+              if AValue <> '' then
+                AEventParams.Values['value'] := AValue;
+              if Supports(c, IEWBaseComponent, AIntf) then AIntf.DoEvent(AEventParams);
+            finally
+              AEventParams.Free;
             end;
 
-            if (aaction = 'keydown') and (Supports(c, IewInput, i)) then (i as IewInput).DoOnKeyDown(AParams);
-            if (aaction = 'input') and (Supports(c, IewInput, i)) then (i as IewInput).DoOnKeyPress(AParams);
-            if (aaction = 'keyup') and (Supports(c, IewInput, i)) then (i as IewInput).DoOnKeyUp(AParams);
-            if (aaction = 'enter') and (Supports(c, IewInput, i)) then (i as IewInput).DoOnEnter;
-            if (aaction = 'exit') and (Supports(c, IewInput, i)) then (i as IewInput).DoOnExit;
-
-
-          end;
+            
+            {if (aaction = 'clickitem') then
+            begin
+              if (Supports(c, IewBaseObjectItemClickable, i)) then
+              begin
+                AItem := IewBaseObjectItemClickable(i).Items[StrToIntDef(AValue, -1)];
+                IewBaseObjectItemClickable(i).DoItemClick(c, AItem, StrToIntDef(AValue, -1));
+              end;
+              if (Supports(c, IEWNavBar)) then 
+              begin
+                
+              end;
+            end;  }
+        end);
       end;
     end;
 
@@ -240,29 +260,29 @@ begin
 
     if (ARequestInfo.Params.Values['async'] = 'T') then
     begin
-      AJson := TJsonArray.Create;
+      AChanges := TJsonArray.Create;
       try
         for ICount := 0 to TForm(ASession.SelectedForm).ComponentCount-1 do
         begin
           c := TForm(ASession.SelectedForm).Components[ICount];
-          if Supports(c, IEWBaseComponent, i) then
+          if Supports(c, IEWBaseComponent, AIntf) then
           begin
-            if i.HasChanged then
+            if AIntf.HasChanged then
             begin
               AObj := TJsonObject.Create;
-              AObj.AddPair('name', I.Name);
-              AObj.AddPair('script', I.Script);
-              AObj.AddPair('html', I.Html);
-              AJson.Add(AObj);
+              AObj.AddPair('name', AIntf.Name);
+              AObj.AddPair('script', AIntf.Script);
+              AObj.AddPair('html', AIntf.Html);
+              AChanges.Add(AObj);
             end;
 
           end;
         end;
-        AResponseInfo.ContentText := AJson.ToJSON;
+        AResponseInfo.ContentText := AChanges.ToJSON;
         AResponseInfo.ResponseNo := 200;
         AResponseInfo.ContentType := 'application/json';
       finally
-        AJson.Free;
+        AChanges.Free;
       end;
     end
     else
@@ -276,9 +296,70 @@ begin
       ABytes := AResponseInfo.ContentStream.Size
     else
       ABytes := AResponseInfo.ContentText.Length;
-
     FBytesSent := FBytesSent + ABytes;
+    FreeAndNil(AJson);
   end;
+end;
+
+function TEWBaseServerController.GetCoreJs: string;
+begin
+ Result := 'function getQueryStringValue (key) '+CR+
+              '{'+CR+
+              '  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));'+CR+
+              '}'+CR+CR+
+              'function httpGet(theUrl)'+CR+
+              '{'+CR+
+              '  var xmlHttp = new XMLHttpRequest();'+CR+
+              '  xmlHttp.open( "GET", theUrl, false); '+CR+
+              '  xmlHttp.send( null );'+CR+
+              '  return xmlHttp.responseText;'+CR+
+              '} '+CR+CR+
+
+              'function asyncEvent(aaction, aname, avalue)'+CR+
+              '{'+CR+
+              '  var url = "http://localhost:8080?async=T&session="+getQueryStringValue("session")+"&action="+aaction+"&name="+aname+"&value="+avalue; '+CR+
+              '  var response = httpGet(url);'+CR+
+              '  if (response=="reload") '+CR+
+              '  {'+CR+
+              '    location.reload();'+CR+
+              '    Exit;' +CR+
+              '  }'+CR+
+              '  var ajson = JSON.parse(response); '+CR+
+              '  ajson.forEach(function(element) {'+CR+
+              '  document.getElementById(element.name).outerHTML = element.html;'+CR+
+              '  if (element.script != "") {eval(element.script);}; '+CR+
+              '  });'+CR+
+              '};'+CR+CR+
+
+              'function eventCall(aaction, avalue, adata)'+CR+
+              '{'+CR+
+              //'alert(avalue);'+
+              '  var url = "/?async=T&session="+getQueryStringValue("session")+"&action="+aaction+"&data="+adata+"&value="+avalue; '+CR+
+              '  var response = httpGet(url);'+CR+
+              '  if (response=="reload") '+CR+
+              '  {'+CR+
+              '    location.reload();'+CR+
+              '    Exit;' +CR+
+              '  }'+CR+
+              '  var ajson = JSON.parse(response); '+CR+
+              '  ajson.forEach(function(element) {'+CR+
+              '  document.getElementById(element.name).outerHTML = element.html;'+CR+
+              '  if (element.script != "") {eval(element.script);}; '+CR+
+              '  });'+CR+
+              '};'+CR+CR+
+
+              'function asyncKeypress(aname, avalue)'+CR+
+              '{'+CR+
+              '  var url = "http://localhost:8080?async=T&session="+getQueryStringValue("session")+"&action=keypress&name="+aname+"&value="+avalue; '+CR+
+              '  var response = httpGet(url);'+CR+
+              '  alert(element.html); '+CR+
+              '  var ajson = JSON.parse(response); '+CR+
+              '  ajson.forEach(function(element) {'+CR+
+              '  document.getElementById(element.name).outerHTML = element.html;'+CR+
+
+              '  });'+CR+
+
+              '};';
 end;
 
 class procedure TEWBaseServerController.Initialize;

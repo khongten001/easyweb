@@ -2,13 +2,14 @@ unit EWTypes;
 
 interface
 
-uses Forms, Classes, Graphics;
+uses Vcl.Forms, Classes, Vcl.Graphics;
 
 type
 
   TEWBaseForm = class(TCustomForm);
 
   TEWClickItemEvent = procedure(Sender: TObject; AItem: string; AIndex: integer) of object;
+  TEWNavItemClickEvent = procedure(Sender: TObject; AItem: TCollectionItem; ADropDownIndex: integer) of object;
 
   TEWKeyEvent = procedure(Sender: TObject; Key: Word) of object;
 
@@ -18,6 +19,8 @@ type
   TEWImageShape = (isDefault, isRoundedCorners, isCircle, isThumbnail);
 
   TEWFontVariant = (fvSmallCaps);
+
+  TEWInputType = (itDate, itDateTime, itEmail, itHidden, itMonthYear, itNumber, itPassword, itText, itTime, itUrl);
 
   //TEWFontFamily = type string;
 

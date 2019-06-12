@@ -16,7 +16,7 @@ type
     function GetHtml: string; override;
     function GetScript: string; override;
     procedure GetGlobalVars(AStrings: TStrings); override;
-
+    procedure DoEvent(APArams: TStrings); override;
     procedure DoTimer; virtual;
   public
     constructor Create(AOwner: TComponent); override;
@@ -28,7 +28,7 @@ type
 
 implementation
 
-uses SysUtils;
+uses SysUtils, Json;
 
 { TEWTimer }
 
@@ -38,9 +38,14 @@ begin
   FInterval := 1000;
 end;
 
+procedure TEWTimer.DoEvent(AParams: TStrings);
+begin
+  inherited;
+  DoTimer;
+end;
+
 procedure TEWTimer.DoTimer;
 begin
-
   if Assigned(FOnTimer) then
     FOnTimer(Self);
 end;
@@ -55,18 +60,26 @@ function TEWTimer.GetHtml: string;
 var
   AScript: string;
 begin
-  inherited;                            //
+  inherited;
   AScript := GetScript;
   Result := '<script id="'+Name+'">'+AScript+'</script>';
 
 end;
 
 function TEWTimer.GetScript: string;
+var
+  AJson: TJsonObject;
 begin
-  if (FActive) and (FInterval > 0) then
-    Result := 'timer'+Name+' = setInterval(function(){ asyncEvent("timer", "'+Name+'", -1); }, '+FInterval.ToString+');'
-  else
-    Result := 'clearTimeout(timer'+Name+');'
+  AJson := TJSONObject.Create;
+  try
+    AJson.AddPair('name', Name);
+    if (FActive) and (FInterval > 0) then
+      Result := 'timer'+Name+' = setInterval(function(){ eventCall(''timer'', '''', '''+AJson.ToString+'''); }, '+FInterval.ToString+');'
+    else
+      Result := 'clearTimeout(timer'+Name+');'
+  finally
+    AJson.Free;
+  end;
 end;
 
 procedure TEWTimer.SetActive(const Value: Boolean);

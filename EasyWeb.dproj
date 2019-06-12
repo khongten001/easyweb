@@ -114,7 +114,8 @@
         </DCCReference>
         <DCCReference Include="EWTimer.pas"/>
         <DCCReference Include="EWTypes.pas"/>
-        <DCCReference Include="EWSpacer.pas"/>
+        <DCCReference Include="EWLayout.pas"/>
+        <DCCReference Include="EWNavBar.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

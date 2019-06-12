@@ -30,6 +30,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property Align;
     property Animated: Boolean read FAnimated write SetAnimated default False;
     property Max: integer read GetMax write SetMax;
     property Min: integer read GetMin write SetMin;
@@ -40,7 +41,7 @@ type
 
 implementation
 
-uses SysUtils, Types, Graphics;
+uses SysUtils, Types, VCL.Graphics;
 
 { TEWProgressBar }
 
@@ -68,8 +69,8 @@ begin
   AStriped := '';
   if FStriped then AStriped := ' progress-bar-striped ';
   if FAnimated then AStriped := AStriped + ' progress-bar-animated';
-  
-  Result := '<div name="'+Name+'" id="'+Name+'" '+GetCss+' class="progress">'+
+
+  Result := '<div id="'+Name+'" '+GetCss+' class="progress">'+
   '<div class="progress-bar '+GetStyleString+' '+AStriped+'" role="progressbar" style="width: '+fPosition.ToString+'%" aria-valuenow="'+FPosition.ToString+
     '" aria-valuemin="'+FMin.ToString+'" aria-valuemax="'+FMax.ToString+'"></div>'+
   '</div>';

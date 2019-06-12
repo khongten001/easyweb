@@ -3,8 +3,8 @@ unit EWStartup;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Graphics,
-  Controls, Forms, Dialogs, StdCtrls, EWConst, Vcl.Buttons, Vcl.ExtCtrls,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, VCL.Forms, Vcl.StdCtrls, EWConst, Vcl.Buttons, Vcl.ExtCtrls,
   Vcl.ComCtrls, System.Actions, Vcl.ActnList, Vcl.Menus;
 
 type
@@ -58,6 +58,8 @@ type
 implementation
 
 uses ShellApi, EWServerControllerBase;
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
 
 var
   frmStartup: TfrmStartup;
