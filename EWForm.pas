@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, VCL.Graphics,
-  VCL.Controls, VCL.Forms, EWBase, EWSession, EWIntf, EWTypes;
+  VCL.Controls, VCL.Forms, EWBase, EWSession, EWIntf, EWTypes, EWDialogs;
 
 type
   TEWForm = class;
@@ -16,6 +16,7 @@ type
     FExtraMeta: TStrings;
     FExtraScript: TStrings;
     FSession: TewSession;
+    FDialogs: TEWDialog;
     function GetHtml: string;
     function GetSession: TewSession;
     procedure SetExtraScript(const Value: TStrings);
@@ -30,6 +31,8 @@ type
     procedure LogText(AText: string);
     function SessionID: string;
     procedure ForceReload;
+    procedure ValidateInsert(AComponent: TComponent); override;
+    procedure ShowMessage(AText: string);
   public
     constructor CreateNew(AOwner: TComponent; Dummy: Integer  = 0); override;
     destructor Destroy; override;
@@ -37,7 +40,7 @@ type
     property Session: TewSession read GetSession write SetSession;
   published
     property Caption;
-    property Color default clwhite;
+    property Color;
     property ExtraMeta: TStrings read FExtraMeta write SetExtraMeta;
     property ExtraScript: TStrings read FExtraScript write SetExtraScript;
     property JavascriptIncludes: TStrings read FJavascriptIncludes write SetJavascriptIncludes;
@@ -53,18 +56,23 @@ implementation
 
 uses EWServerControllerBase, EWConst, System.Generics.Collections, System.Generics.Defaults;
 
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
 type
   TEWBaseObjectList = TObjectList<TewBaseObject>;
+
+
 
 {$R *.dfm}
 
 constructor TEWForm.CreateNew(AOwner: TComponent; Dummy: Integer  = 0);
 begin
   inherited;
+  FDialogs := TEWDialog.Create(Self);
+  FDialogs.Name := Name+'Dialog';
   FExtraMeta := TStringList.Create;
   FExtraScript := TStringList.Create;
   FJavascriptIncludes := TStringList.Create;
-  Color := clWhite;
 end;
 
 destructor TEWForm.Destroy;
@@ -72,6 +80,7 @@ begin
   FExtraScript.Free;
   FExtraMeta.Free;
   FJavascriptIncludes.Free;
+  FDialogs.Free;
   inherited;
 end;
 
@@ -123,7 +132,6 @@ begin
 
       if Supports(Self.Components[ICount], IEWBaseVisualObject, i) then
       begin
-        //ACss.Add('.'+c.Name+' { '+i.CssCommaText+' } '+#13#10);
         i.GetEventListners(AListners);
       end;
     end;
@@ -135,10 +143,16 @@ begin
               '<meta charset="utf-8">'+CR+
               '<meta name="viewport" content="width=device-width, initial-scale=1">'+CR+
               Trim(FExtraMeta.Text)+
-              '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">'+CR+
-              '<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>'+CR+
-              '<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>'+CR+
-              '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>'+CR+
+              //'<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">'+CR+
+              //'<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>'+CR+
+              //'<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>'+CR+
+              //'<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>'+CR+
+              '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">'+CR+
+              '<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>'+CR+
+              '<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>'+CR+
+              '<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>'+CR+
+
+
               '<script type="text/javascript" src="/EWCore.js"></script>'+CR+
               Trim(AIncludes.Text)+CR+
               '<style>'+CR+
@@ -154,8 +168,8 @@ begin
               '</script>'+CR+
 
               '</head>'+CR+
-              '<body>';
-
+              '<body>'+
+              '<easyweb id='+Name+'>';
 
 
       for ICount := 0 to ComponentCount-1 do
@@ -165,20 +179,19 @@ begin
 
         if Self.Components[ICount] is TEWBaseObject then
         begin
-          //AList.Add(Self.Components[ICount] as TEWBaseObject)
           if TewBaseObject(Self.Components[ICount] ).Parent = Self then
             Result := Result + TEWBaseObject(Self.Components[ICount] ).Html +CR;
         end;
       end;
 
     Result := Result +CR+
+               '</easyweb>'+
               '</body>'+CR+
             '</html>';
   finally
     AListners.Free;
     AIncludes.Free;
     AGlobals.Free;
-    //ACss.Free;
   end;
 
 end;
@@ -251,6 +264,21 @@ end;
 procedure TEWForm.SetSession(const Value: TewSession);
 begin
   FSession := Value;
+end;
+
+procedure TEWForm.ShowMessage(AText: string);
+begin
+  FDialogs.ShowMessage(AText);
+end;
+
+procedure TEWForm.ValidateInsert(AComponent: TComponent);
+var
+  AIntf: IEWBaseComponent;
+begin
+  if (AComponent is TControl) and (Supports(AComponent, IEWBaseComponent, AIntf) = False) then
+    raise EInvalidInsert.Create(SInvalidControlType+CR+CR+SUseEasyWebCompsOnly)
+  else
+    inherited;
 end;
 
 end.

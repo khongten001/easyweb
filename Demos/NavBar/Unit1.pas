@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EWForm, EWBase, EWButtons, EWNavBar,
-  EWLabel, Vcl.Imaging.jpeg, EWImages, EWEdits;
+  EWLabel, Vcl.Imaging.jpeg, EWTypes;
 type
   TForm57 = class(TEwForm)
     EWNavBar1: TEWNavBar;
@@ -19,16 +19,14 @@ type
     procedure EWImage1Click(Sender: TObject);
     procedure EWImage1RightClick(Sender: TObject);
     procedure EWImage1DblClick(Sender: TObject);
+    procedure EWNavBar1Search(Sender: TObject; ASearch: string);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-
-
 implementation
-
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
@@ -87,8 +85,15 @@ begin
       1: EWNavBar1.Style := nbsLight;
       2: EWNavBar1.Style := nbsDark;
       3: EWNavBar1.Style := nbsPrimary;
+      4: EWNavBar1.Style := nbsSuccess;
     end;
   end;
+end;
+
+procedure TForm57.EWNavBar1Search(Sender: TObject; ASearch: string);
+begin
+  if Trim(ASearch) <> '' then
+    EWLabel1.Text := 'You searched for: '+ASearch;
 end;
 
 initialization

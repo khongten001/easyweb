@@ -111,7 +111,7 @@ begin
   if AImg <> nil then
   begin
     AResponseInfo.ContentStream := TMemoryStream.Create;
-    AImg.Picture.SaveToStream(AResponseInfo.ContentStream);
+    AImg.Picture.Graphic.SaveToStream(AResponseInfo.ContentStream);
     AResponseInfo.ContentStream.Position := 0;
     if (AImg.Picture.Graphic is TPngImage) then AResponseInfo.ContentType := 'image/png';
     if (AImg.Picture.Graphic is TJPEGImage) then AResponseInfo.ContentType := 'image/jpeg';
@@ -186,6 +186,7 @@ begin
       begin
         AJson := TJSONObject.ParseJSONValue(AData) as TJSONObject;
         AName := AJson.GetValue('name').Value;
+        if AValue <> '' then AJSon.AddPair('value', AValue);
 
       end;
 
@@ -210,20 +211,6 @@ begin
             finally
               AEventParams.Free;
             end;
-
-            
-            {if (aaction = 'clickitem') then
-            begin
-              if (Supports(c, IewBaseObjectItemClickable, i)) then
-              begin
-                AItem := IewBaseObjectItemClickable(i).Items[StrToIntDef(AValue, -1)];
-                IewBaseObjectItemClickable(i).DoItemClick(c, AItem, StrToIntDef(AValue, -1));
-              end;
-              if (Supports(c, IEWNavBar)) then 
-              begin
-                
-              end;
-            end;  }
         end);
       end;
     end;
@@ -240,9 +227,6 @@ begin
         Sessions.AddSession(s);
       end
     );
-
-
-
 
 
       AResponseInfo.Redirect(ARequestInfo.Command+'?session='+s);
@@ -267,6 +251,7 @@ begin
           c := TForm(ASession.SelectedForm).Components[ICount];
           if Supports(c, IEWBaseComponent, AIntf) then
           begin
+
             if AIntf.HasChanged then
             begin
               AObj := TJsonObject.Create;

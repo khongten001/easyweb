@@ -2,7 +2,7 @@ unit EWLayout;
 
 interface
 
-uses Classes, EWIntf, EWBase, Graphics, EWTypes;
+uses Classes, EWIntf, EWBase, VCL.Graphics, EWTypes;
 
 type
   TEWLayout = class(TEWBaseObject, IEWLayout)

@@ -2,7 +2,7 @@ unit EWBase;
 
 interface
 
-uses Messages, Classes, VCL.Controls, VCL.Forms, EWTypes, EWIntf, Types;
+uses Messages, Classes, VCL.Controls, VCL.Forms, EWTypes, EWIntf, System.Types;
 
 type
   TEWBaseComponent = class(TComponent, IEWBaseComponent)
@@ -41,32 +41,24 @@ type
     procedure GetGlobalVars(AStrings: TStrings); virtual;
     procedure AddObjectEvent(AID, AAction: string; ANameValues: array of string; AEvents: TStrings; AValueJS: string; const APreventDefault: Boolean = False); overload;
     procedure AddObjectEvent(AID, AAction: string; ANameValues, AEvents: TStrings; AValueJS: string; const APreventDefault: Boolean = False); overload;
-
     procedure AddMouseEnterEvent(AEvents: TStrings);
     procedure AddMouseLeaveEvent(AEvents: TStrings);
     procedure AddClickEvent(AEvents: TStrings); virtual;
     procedure AddRightClickEvent(AEvents: TStrings);
     procedure AddDblClickEvent(AEvents: TStrings);
-
     procedure AddEnterEvent(AEvents: TStrings);
     procedure AddExitEvent(AEvents: TStrings);
-
     procedure AddOnKeyDownEvent(AEvents: TStrings);
     procedure AddOnKeyPressEvent(AEvents: TStrings);
     procedure AddOnKeyUpEvent(AEvents: TStrings);
-
     procedure AddOnChangeEvent(AEvents: TStrings);
-
     procedure DoEvent(AParams: TStrings); virtual;
-
     procedure DoClick(AParams: TStrings); virtual;
     procedure DoRightClick(AParams: TStrings); virtual;
     procedure DoDblClick(AParams: TStrings); virtual;
     procedure DoMouseEnter(AParams: TStrings);  virtual;
     procedure DoMouseLeave(AParams: TStrings);  virtual;
     procedure DoOnChange(AParams: TStrings); virtual;
-    
-
     procedure SetName(const Value: TComponentName); override;
     procedure VisibleChanging; override;
     function GetHtml: string; virtual;
@@ -84,7 +76,6 @@ type
     function SessionID: string;
     property Html: string read GetHtml;
     property HasChanged: Boolean read GetHasChanged write FChanged;
-    //function CssCommaText: string; virtual;
   published
     property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
     property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
@@ -180,13 +171,11 @@ end;
 procedure TewBaseObject.AddOnKeyPressEvent(AEvents: TStrings);
 begin
   AddObjectEvent(Name, 'input', [], AEvents, 'document.getElementById(''' + Name +''').value');
-  //AEvents.Add('$(document).on(''input'',''#'+Name+''',function(){ asyncEvent("input", "'+Name+'", document.getElementById(''' + Name +''').value); }); ');
 end;
 
 procedure TewBaseObject.AddOnKeyUpEvent(AEvents: TStrings);
 begin
   AddObjectEvent(Name, 'keyup', [], AEvents, 'event.keyCode');
-  //AEvents.Add('$(document).on(''keyup'',''#'+Name+''',function(){ asyncEvent("keyup", "'+Name+'", event.keyCode); }); ');
 end;
 
 procedure TewBaseObject.AddObjectEvent(AID, AAction: string;
@@ -204,14 +193,11 @@ begin
     AJson.AddPair('name', Name);
     AJson.AddPair('event', AAction);
     if APreventDefault then
-      APreventFunc := 'ev.preventDefault(); ';
-
+      APreventFunc := 'event.preventDefault(); ';
     for ICount := 0 to ANameValues.Count-1 do
       AJson.AddPair(ANameValues.Names[ICount], ANameValues.ValueFromIndex[ICount]);
-
     if Trim(AValueJS) = '' then
       AValueJS := '''''';
-
     AEvents.Add('$(document).on('''+AAction+''',''#'+AID+''+''',function(event) {'+APreventFunc+'eventCall('''+AAction+''', '+AValueJS+', '''+AJson.ToJSON+'''); }); ');
   finally
     AJson.Free;
@@ -241,17 +227,6 @@ procedure TewBaseObject.AddOnChangeEvent(AEvents: TStrings);
 begin
   AEvents.Add('$(document).on(''change'',''#'+Name+''',function(){ asyncEvent("change", "'+Name+'", document.getElementById(''' + Name +''').value); }); ');
 end;
-
-
-(*procedure TewBaseObject.AddClickItemEvent(AItemIndex: integer; AEvents: TStrings);
-var
-  n: string;
-  i: string;
-begin
-  i := AItemIndex.ToString;
-  n := Name+'-'+i;
-  AEvents.Add('$(document).on(''click'',''#'+n+''',function(){ asyncEvent("clickitem", "'+Name+'", '+i+'); }); ');
-end;    *)
 
 procedure TewBaseObject.BuildCss(AProperties: TStrings);
 var
@@ -307,11 +282,6 @@ begin
       AProperties.Values['top'] := IntToStr(Top) + 'px';
       AProperties.Values['bottom'] := (Parent.ClientHeight - (Height+Top)).ToString+ 'px';
     end;
-  end
-  else
-  begin
-    //AProperties.Values['width'] := IntToStr(Width) + 'px';
-    //AProperties.Values['height'] := '100px';
   end;
   if not Visible then
     AProperties.Values['display'] := 'none';
@@ -333,33 +303,10 @@ end;
 constructor TewBaseObject.Create(AOwner: TComponent);
 begin
   inherited;
-  //ControlStyle := ControlStyle + [csAcceptsControls];
   FCssProperties := TStringList.Create;
   FMouseOver := False;
 
 end;
-                   {
-function TewBaseObject.CssCommaText: string;
-var
-  AStrings:TStrings;
-  ICount: integer;
-begin
-  Result := '';
-  AStrings := TStringList.Create;
-  try
-    BuildCss(AStrings);
-    //Result := AStrings.CommaText;
-    for ICount := 0 to AStrings.Count-1 do
-    begin
-      Result := Result + AStrings.Names[ICount]+': '+AStrings.ValueFromIndex[ICount];
-      if ICount < AStrings.Count-1 then
-        Result := Result + '; ';
-    end;
-
-  finally
-    AStrings.Free;
-  end;
-end;   }
 
 function TewBaseObject.DesignTimeCaption: string;
 begin

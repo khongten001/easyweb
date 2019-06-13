@@ -23,8 +23,6 @@ type
     EWLabel6: TEWLabel;
     EWButton3: TEWButton;
     EWEdit1: TEWEdit;
-    procedure EWDropDown1ItemClick(Sender: TObject; AItem: string;
-      AIndex: Integer);
     procedure EWImage1MouseEnter(Sender: TObject);
     procedure EWImage1MouseLeave(Sender: TObject);
     procedure EWImage1Click(Sender: TObject);
@@ -36,6 +34,8 @@ type
     procedure EWDropDown2ItemClick(Sender: TObject; AItem: string;
       AIndex: Integer);
     procedure EWButton3Click(Sender: TObject);
+    procedure EWDropDown1ItemClick(Sender: TObject; AItem: TCollectionItem;
+      ADropDownIndex: Integer);
   private
     { Private declarations }
   public
@@ -75,10 +75,10 @@ begin
   EWProgressBar1.Animated := EWCheckBox1.Checked;
 end;
 
-procedure TForm1.EWDropDown1ItemClick(Sender: TObject; AItem: string;
-  AIndex: Integer);
+procedure TForm1.EWDropDown1ItemClick(Sender: TObject; AItem: TCollectionItem;
+  ADropDownIndex: Integer);
 begin
-  EWLabel3.Text := 'You clicked '+AItem;
+  EWLabel3.Text := 'You clicked '+TEWDropDownItem(AItem).Text;
 end;
 
 procedure TForm1.EWDropDown2ItemClick(Sender: TObject; AItem: string;

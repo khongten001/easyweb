@@ -154,12 +154,13 @@ begin
                        'T%FormIdent%.SetAsMainForm;'+#13#10+#13#10;
 
   AFormTemplate := 'object %FormIdent%: T%FormIdent%' +#13#10+
-  'Left = 0' +#13#10+
-  'Top = 0' +#13#10+
-  'Width = 321' +#13#10+
-  'Height = 240' +#13#10+
-  'PixelsPerInch = 96' +#13#10+
-  'TextHeight = 13' +#13#10+
+  'Left = 0' +CR+
+  'Top = 0' +CR+
+  'Width = 321' +CR+
+  'Height = 240' +CR+
+  'Color = clWhite '+CR+
+  'PixelsPerInch = 96' +CR+
+  'TextHeight = 13' +CR+
 'end';
 
   AImplTemplate :=

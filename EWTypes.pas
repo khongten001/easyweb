@@ -10,11 +10,13 @@ type
 
   TEWClickItemEvent = procedure(Sender: TObject; AItem: string; AIndex: integer) of object;
   TEWNavItemClickEvent = procedure(Sender: TObject; AItem: TCollectionItem; ADropDownIndex: integer) of object;
+  TEWDropDownClickItemEvent = procedure(Sender: TObject; AItem: TCollectionItem; ADropDownIndex: integer) of object;
 
   TEWKeyEvent = procedure(Sender: TObject; Key: Word) of object;
 
   TEWButtonType = (btDefault, btBasic, btPrimary, btSecondary, btSuccess,
                    btDanger, btWarning, btInfo, btLight, btDark, btLink);
+  TEWButtonGroupLayout = (bgHorizontal, bgVertical);
 
   TEWImageShape = (isDefault, isRoundedCorners, isCircle, isThumbnail);
 
@@ -44,13 +46,13 @@ type
   public
     constructor Create;
     procedure Assign(Source: TPersistent); override;
+    property AsCssProperty: string read GetAsCssProperty;
   published
     property Family: string read FFamily write SetFamily;
     property Variant: string read FVariant write SetVariant;
-    property Size: integer read FSize write SetSize default 12;
+    property Size: integer read FSize write SetSize;// default 12;
     property Style: TFontStyles read FStyle write SetStyle;
     property Color: TColor read FColor write SetColor;
-    property AsCssProperty: string read GetAsCssProperty;
   end;
 
 
@@ -58,7 +60,7 @@ type
 
 implementation
 
-uses Windows, SysUtils;
+uses Windows, SysUtils, GraphUtil;
 
 function ColorToHex( Color : TColor ): string;
 begin
@@ -66,6 +68,14 @@ begin
             IntToHex( GetRValue( Color ), 2 ) +
             IntToHex( GetGValue( Color ), 2 ) +
             IntToHex( GetBValue( Color ), 2 );
+end;
+
+function DarkenColor(AColor: TColor): TColor;
+var
+  H, S, L: Word;
+begin
+  ColorRGBToHLS(AColor, H, L, S);
+  Result := ColorHLSToRGB(H, 100, S);
 end;
 
 { TEWFont }
@@ -88,13 +98,12 @@ end;
 constructor TEWFont.Create;
 begin
   inherited;
-  FSize := 12;
 end;
 
 function TEWFont.GetAsCssProperty: string;
 
 begin
-  Result := '';
+  Result := ' ';
   if (fsBold in FStyle) then Result := Result + 'bold ';
   if (fsItalic in FStyle) then Result := Result + 'italic ';
   if (fsUnderline in FStyle) then Result := Result + 'underline ';

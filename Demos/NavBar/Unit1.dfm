@@ -1,15 +1,15 @@
 object Form57: TForm57
   Left = 0
   Top = 0
-  Width = 473
-  Height = 287
-  Color = clBtnFace
+  Width = 610
+  Height = 362
+  Color = clWhite
   PixelsPerInch = 96
   TextHeight = 13
   object EWNavBar1: TEWNavBar
     Left = 0
     Top = 0
-    Width = 457
+    Width = 594
     Height = 41
     Items = <
       item
@@ -29,19 +29,26 @@ object Form57: TForm57
           'Default'
           'Light'
           'Dark'
-          'Primary')
+          'Primary'
+          'Success')
         Text = 'NavBar Style'
       end>
     Title = 'EasyWeb'
-    Style = nbsPrimary
+    SearchOptions.ButtonText = 'Search'
+    SearchOptions.Placeholder = 'Search'
+    SearchOptions.Visible = True
+    Style = nbsSuccess
     OnBrandClick = EWNavBar1BrandClick
     OnItemClick = EWNavBar1ItemClick
+    OnSearch = EWNavBar1Search
+    ExplicitWidth = 663
   end
   object EWLabel1: TEWLabel
     Left = 16
     Top = 63
     Width = 353
     Height = 41
+    Font.Size = 0
     Font.Style = []
     Font.Color = clBlack
     Text = ''

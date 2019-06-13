@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{73275868-C419-4FE5-8EB7-4B48A5093D23}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="EasyWebRun_XE8.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="EasyWebDsgn_XE8.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="EasyWebRun_XE8">
+        <MSBuild Projects="EasyWebRun_XE8.dproj"/>
+    </Target>
+    <Target Name="EasyWebRun_XE8:Clean">
+        <MSBuild Projects="EasyWebRun_XE8.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EasyWebRun_XE8:Make">
+        <MSBuild Projects="EasyWebRun_XE8.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EasyWebDsgn_XE8">
+        <MSBuild Projects="EasyWebDsgn_XE8.dproj"/>
+    </Target>
+    <Target Name="EasyWebDsgn_XE8:Clean">
+        <MSBuild Projects="EasyWebDsgn_XE8.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EasyWebDsgn_XE8:Make">
+        <MSBuild Projects="EasyWebDsgn_XE8.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="EasyWebRun_XE8;EasyWebDsgn_XE8"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="EasyWebRun_XE8:Clean;EasyWebDsgn_XE8:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="EasyWebRun_XE8:Make;EasyWebDsgn_XE8:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

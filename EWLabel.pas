@@ -52,6 +52,7 @@ begin
   if FBackgroundColor <> clNone then
     AProperties.Values['background-color'] := ColorToHex(FBackgroundColor);
   AProperties.Values['font'] := StringReplace(FFont.AsCssProperty, '"', '''', [rfReplaceAll]);
+  AProperties.Values['color'] := ColorToHex(FFont.Color);
 end;
 
 constructor TEWLabel.Create(AOwner: TComponent);
@@ -88,7 +89,7 @@ begin
     taVerticalCenter: ATranslate := '50%';
     taAlignBottom: ATranslate := '100%';
   end;
-  Result := '<div id="'+Name+'" '+GetCss+' style="position: relative; top: '+IntToStr(Height div 2)+'px; transform: translateY(-'+ATranslate+')">'+FText+'</div>';
+  Result := '<div id="'+Name+'" '+GetCss+{' style="position: relative; top: '+IntToStr(Height div 2)+'px; transform: translateY(-'+ATranslate+')"}'>'+FText+'</div>';
 end;
 
 function TEWLabel.GetText: string;

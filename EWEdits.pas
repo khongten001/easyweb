@@ -53,7 +53,7 @@ type
 
 implementation
 
-uses Types, VCL.Graphics, SysUtils;
+uses System.Types, VCL.Graphics, SysUtils;
 
 { TEWEdit }
 

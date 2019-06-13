@@ -7,7 +7,30 @@ uses Classes, EWIntf, EWBase, VCL.Graphics, EWTypes;
 type
   TEWNavBar = class;
 
-  TEWNavBarStyle = (nbsDefault, nbsLight, nbsPrimary, nbsDark);
+  TEWNavBarStyle = (nbsDefault, nbsLight, nbsPrimary, nbsSuccess, nbsDark);
+
+  TEWNavBarSearchEvent = procedure(Sender: TObject; ASearch: string) of object;
+
+
+
+  TEWNavBarSearchOptions = class(TPersistent)
+  private
+    FNavBar: TEWNavBar;
+    FVisible: Boolean;
+    FPlaceHolder: string;
+    FButtonText: string;
+    procedure SetButtonText(const Value: string);
+    procedure SetPlaceholder(const Value: string);
+    procedure SetVisible(const Value: Boolean);
+    procedure Changed;
+  public
+    constructor Create(ANavBar: TEWNavBar);
+    procedure Assign(ASource: TPersistent); override;
+  published
+    property ButtonText: string read FButtonText write SetButtonText;
+    property Placeholder: string read FPlaceHolder write SetPlaceholder;
+    property Visible: Boolean read FVisible write SetVisible default False;
+  end;
 
   TEWNavBarItem = class(TCollectionItem)
   private
@@ -30,7 +53,7 @@ type
   private
     FNavBar: TEWNavBar;
   protected
-    function GetOwner: TPersistent; override;
+    //nction GetOwner: TPersistent; override;
     function GetItem(Index: Integer): TEWNavBarItem;
     procedure SetItem(Index: Integer; Value: TEWNavBarItem);
   public
@@ -47,15 +70,17 @@ type
     FStyle: TEWNavBarStyle;
     FOnItemClick: TEWNavItemClickEvent;
     FOnBrandClick: TNotifyEvent;
+    FOnSearch: TEWNavBarSearchEvent;
+    FSearchOptions: TEWNavBarSearchOptions;
     function GetStyleClass: string;
     procedure SetItems(const Value: TEWNavBarItemCollection);
     procedure SetTitle(const Value: string);
     procedure SetStyle(const Value: TEWNavBarStyle);
+    procedure SetSearchOptions(const Value: TEWNavBarSearchOptions);
   protected
     procedure DoItemClick(ASender: TObject; AData: string);
     procedure GetEventListners(AListners: TStrings); override;
     procedure BuildCss(AProperties: TStrings); override;
-    function DesignTimeCaption: string; override;
     function GetHtml: string; override;
     procedure Paint; override;
     procedure DoEvent(AParams: TStrings); override;
@@ -65,9 +90,11 @@ type
   published
     property Items: TEWNavBarItemCollection read FItems write SetItems;
     property Title: string read FTitle write SetTitle;
+    property SearchOptions: TEWNavBarSearchOptions read FSearchOptions write SetSearchOptions;
     property Style: TEWNavBarStyle read FStyle write SetStyle default nbsDefault;
     property OnBrandClick: TNotifyEvent read FOnBrandClick write FOnBrandClick;
     property OnItemClick: TEWNavItemClickEvent read FOnItemClick write FOnItemClick;
+    property OnSearch: TEWNavBarSearchEvent read FOnSearch write FOnSearch;
 
   end;
 
@@ -86,18 +113,14 @@ constructor TEWNavBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FItems := TEWNavBarItemCollection.Create(Self);
+  FSearchOptions := TEWNavBarSearchOptions.Create(Self);
   Align := alTop;
-end;
-
-function TEWNavBar.DesignTimeCaption: string;
-begin
-  inherited;
-
 end;
 
 destructor TEWNavBar.Destroy;
 begin
   FItems.Free;
+  FSearchOptions.Free;
   inherited;
 end;
 
@@ -107,6 +130,14 @@ var
   ASubIndex: integer;
 begin
   inherited;
+  if AParams.Values['action'] = 'search' then
+  begin
+
+    if Assigned(FOnSearch) then
+      FOnSearch(Self, AParams.Values['value']);
+    Exit;
+  end;
+
   AIndex := StrToIntDef(AParams.Values['index'], -1);
   ASubIndex := StrToIntDef(AParams.Values['sub-index'], -1);
   if (AIndex = -1) and (Assigned(FOnBrandClick)) then
@@ -131,7 +162,7 @@ begin
     if AJson.GetValue('sub-index') <> nil then
       ASubIndex := StrToIntDef(AJson.GetValue('sub-index').Value, -1);
     if Assigned(FOnItemClick) then
-      FOnItemClick(Self, FItems[AIndex], ASubIndex);
+      FOnItemClick(Self, FItems.Items[AIndex], ASubIndex);
   finally
     AJson.Free;
   end;
@@ -145,6 +176,12 @@ begin
   inherited;
   if Assigned(FOnBrandClick) then
     AddObjectEvent(Name+'Brand', 'click', [], AListners, '');
+
+  if Assigned(FOnSearch) then
+  begin
+    AddObjectEvent(Name+'SearchButton', 'click', ['action=search'], AListners, 'document.getElementById("'+Name+'SearchInput").value');
+    AddObjectEvent(Name+'SearchInput', 'search', ['action=search'], AListners, 'document.getElementById("'+Name+'SearchInput").value');
+  end;
 
   for AItem in FItems do
   begin
@@ -160,6 +197,7 @@ begin
                      AListners, '');
     end;
   end;
+
 end;
 
 function TEWNavBar.GetHtml: string;
@@ -167,14 +205,20 @@ var
   AItem: TCollectionItem;
 begin
   inherited;
-  Result := '<nav id="'+Name+'" class="navbar navbar-expand-sm '+GetStyleClass+'">'+
-  '<a id="'+Name+'Brand'+'" class="navbar-brand" href="#">'+FTitle+'</a>'+
-  '<ul class="navbar-nav">';
-
-  for AItem in Fitems do
+  Result := '<nav id="'+Name+'" class="navbar navbar-expand-lg justify-content-between '+GetStyleClass+'">'+
+  '<a d="'+Name+'Brand'+'" class="navbar-brand" href="#">'+FTitle+'</a>'+
+  '<ul class="navbar-nav mr-auto">';
+      for AItem in Fitems do
     Result :=Result + TEWNavBarItem(AItem).GetHtml;
-
-  Result := Result + '</ul></nav>';
+    Result := Result + '</ul>';
+  if FSearchOptions.Visible then
+  begin
+    Result := Result + '<form class="form-inline" onsubmit="return false;">'+
+      '<input id="'+Name+'SearchInput" class="form-control mr-sm-2" type="search" placeholder="'+FSearchOptions.Placeholder+'" aria-label="Search">'+
+      '<button id="'+Name+'SearchButton" class="btn btn-outline-default my-2 my-sm-0" type="button">'+FSearchOptions.ButtonText+'</button>'+
+    '</form>';
+  end;
+  Result := Result + '</nav>';
 end;
 
 function TEWNavBar.GetStyleClass: string;
@@ -184,6 +228,7 @@ begin
     nbsLight: Result := 'navbar-light';
     nbsPrimary: Result := 'navbar-dark bg-primary';
     nbsDark: Result := 'navbar-dark bg-dark';
+    nbsSuccess: Result := 'navbar-dark bg-success';
   end;
 end;
 
@@ -205,6 +250,7 @@ begin
     nbsLight: ABackground := clNone;
     nbsPrimary: ABackground := clWebDodgerBlue;
     nbsDark: ABackground := clDkGray;
+    nbsSuccess: ABackground := clGreen;
   end;
 
   case FStyle of
@@ -212,6 +258,7 @@ begin
     nbsLight: AFontColor := clGray;
     nbsPrimary: AFontColor := clWhite;
     nbsDark: AFontColor := clWhite;
+    nbsSuccess: AFontColor := clWhite;
   end;
 
   Canvas.Font.Color := AFontColor;
@@ -233,10 +280,10 @@ begin
   canvas.Font.Size := 10;
   for ICount := 0 to FItems.Count-1 do
   begin
-    s := FItems[ICount].Text;
+    s := TEWNavBarItem(FItems.Items[ICount]).Text;
     t.Width := Canvas.TextWidth(s)+32;
     Canvas.TextRect(t, s, [tfSingleLine, tfVerticalCenter, tfCenter]);
-    if FItems[ICount].FDropdownItems.Count > 0 then
+    if TEWNavBarItem(FItems.Items[ICount]).FDropdownItems.Count > 0 then
     begin
       r := t;
       r.Left := r.Right-16;
@@ -254,6 +301,11 @@ end;
 procedure TEWNavBar.SetItems(const Value: TEWNavBarItemCollection);
 begin
   FItems.Assign(Value);
+end;
+
+procedure TEWNavBar.SetSearchOptions(const Value: TEWNavBarSearchOptions);
+begin
+  FSearchOptions.Assign(Value);
 end;
 
 procedure TEWNavBar.SetStyle(const Value: TEWNavBarStyle);
@@ -281,7 +333,6 @@ begin
   inherited;
   if (Source is TEWNavBarItem) then
   begin
-    //ID := (Source as TEWNavBarItem).ID;
     Text := (Source as TEWNavBarItem).Text;
     Changed;
   end;
@@ -355,11 +406,11 @@ function TEWNavBarItemCollection.GetItem(Index: Integer): TEWNavBarItem;
 begin
   Result := inherited Items[index] as TEWNavBarItem;
 end;
-
+                {
 function TEWNavBarItemCollection.GetOwner: TPersistent;
 begin
   Result := FNavBar;
-end;
+end;        }
 
 function TEWNavBarItemCollection.Insert(Index: Integer): TEWNavBarItem;
 begin
@@ -370,6 +421,56 @@ procedure TEWNavBarItemCollection.SetItem(Index: Integer;
   Value: TEWNavBarItem);
 begin
   inherited SetItem(index, Value);
+end;
+
+{ TEWNavBarSearchOptions }
+
+procedure TEWNavBarSearchOptions.Assign(ASource: TPersistent);
+begin
+  inherited;
+  Visible := (ASource as TEWNavBarSearchOptions).Visible;
+  PlaceHolder := (ASource as TEWNavBarSearchOptions).Placeholder;
+  ButtonText := (ASource as TEWNavBarSearchOptions).ButtonText;
+end;
+
+procedure TEWNavBarSearchOptions.Changed;
+begin
+  FNavBar.Changed;
+end;
+
+constructor TEWNavBarSearchOptions.Create(ANavBar: TEWNavBar);
+begin
+  inherited Create;
+  FNavBar := ANavBar;
+  FVisible := False;
+  FPlaceHolder := 'Search';
+  FButtonText := 'Search';
+end;
+
+procedure TEWNavBarSearchOptions.SetButtonText(const Value: string);
+begin
+  if FButtonText <> Value then
+  begin
+    FButtonText := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWNavBarSearchOptions.SetPlaceholder(const Value: string);
+begin
+  if FPlaceHolder <> Value then
+  begin
+    FPlaceHolder := Value;
+  end;
+end;
+
+procedure TEWNavBarSearchOptions.SetVisible(const Value: Boolean);
+begin
+  if FVisible <> Value then
+  begin
+    FVisible := Value;
+    Changed;
+  end;
 end;
 
 end.

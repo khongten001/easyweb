@@ -1,4 +1,4 @@
-package easyWebDsgn;
+package EasyWebDsgn_XE8;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -33,7 +33,7 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
-  easyWeb;
+  EasyWebRun_XE8;
 
 contains
   EWRegister in 'EWRegister.pas',
@@ -41,5 +41,6 @@ contains
   EWIdeHelpers in 'EWIdeHelpers.pas';
 
 end.
+
 
 

@@ -4,6 +4,7 @@ object Form1: TForm1
   Width = 526
   Height = 774
   Caption = 'Form1'
+  Color = clBtnFace
   PixelsPerInch = 96
   TextHeight = 13
   object EWLabel2: TEWLabel
@@ -23,10 +24,7 @@ object Form1: TForm1
     Height = 41
     ButtonType = btPrimary
     Text = 'EWDropDown1'
-    Items.Strings = (
-      'Option 1'
-      'Option 2'
-      'Option 3')
+    Items = <>
     OnItemClick = EWDropDown1ItemClick
   end
   object EWButton1: TEWButton
@@ -621,12 +619,7 @@ object Form1: TForm1
     Height = 41
     ButtonType = btPrimary
     Text = 'EWDropDown1'
-    Items.Strings = (
-      'Red'
-      'Green'
-      'Yellow'
-      'Blue')
-    OnItemClick = EWDropDown2ItemClick
+    Items = <>
   end
   object EWCheckBox1: TEWCheckBox
     Left = 280
@@ -642,6 +635,7 @@ object Form1: TForm1
     Top = 177
     Width = 100
     Height = 41
+    Font.Size = 0
     Font.Style = []
     Font.Color = clBlack
     Text = 'Animated'

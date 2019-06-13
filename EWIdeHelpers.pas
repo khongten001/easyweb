@@ -70,7 +70,7 @@ type
     IOTAProjectCreator50,
     IOTAProjectCreator80,
     IOTAProjectCreator160,
-    IOTAProjectCreator190,
+    //IOTAProjectCreator190,
     IOTAProjectCreator)
   protected
     function GetOwner: IOTAModule; override;

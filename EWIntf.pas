@@ -24,10 +24,12 @@ type
     function GetScript: string;
     procedure GetGlobalVars(AStrings: TStrings);
     function GetHtml: string;
+    procedure Changed;
     property Html: string read GetHtml;
     property HasChanged: Boolean read GetHasChanged;
     property Name: string read GetName;
     property Script: string read GetScript;
+
   end;
 
   IEWBaseVisualObject = interface

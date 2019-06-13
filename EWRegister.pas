@@ -25,7 +25,9 @@ uses
   EWTimer,
   EWTypes,
   EWLayout,
-  EWNavBar;
+  EWNavBar,
+  EWDialogs;
+
 
 type
   TEWFontFamilyList = class(TStringProperty)
@@ -53,6 +55,7 @@ begin
   RegisterComponents('EasyWeb', [TEWLayout]);
   RegisterComponents('EasyWeb', [TEWTimer]);
   RegisterComponents('EasyWeb', [TEWNavBar]);
+  RegisterComponents('EasyWeb', [TEWDialog]);
   RegisterPropertyEditor(TypeInfo(string), TEWFont, 'Family', TEWFontFamilyList);
 
 end;

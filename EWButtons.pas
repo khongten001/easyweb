@@ -2,20 +2,26 @@ unit EWButtons;
 
 interface
 
-uses Windows, Classes, EWIntf, EWBase, EWTypes;
+uses Windows, Classes, EWIntf, EWBase, EWTypes, EWBadge;
 
 type
+  TEWDropDown = class;
+
   TEWButton = class(TewBaseObject, IEWButton)
   private
     FButtonType: TewButtonType;
     FBorderRadius: integer;
+    FOutline: Boolean;
     FText: string;
+    FBadge: TEWBadge;
     function GetButtonType: TewButtonType;
     function GetButtonTypeStr: string;
     procedure SetButtonType(const Value: TewButtonType);
     function GetText: string;
     procedure SetText(const Value: string);
     procedure SetBorderRadius(const Value: integer);
+    procedure SetOutline(const Value: Boolean);
+    procedure SetBadge(const Value: TEWBadge);
   protected
     function GetHtml: string; override;
     function DesignTimeCaption: string; override;
@@ -23,39 +29,74 @@ type
     procedure BuildCss(AProperties: TStrings); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   published
     property Align;
+    property Badge: TEWBadge read FBadge write SetBadge;
     property ButtonType: TewButtonType read GetButtonType write SetButtonType default btSecondary;
+    property Outline: Boolean read FOutline write SetOutline default False;
     property Text: string read GetText write SetText;
     property BorderRadius: integer read FBorderRadius write SetBorderRadius default 0;
   end;
 
-  TEWDropDown = class(TEWButton, IEWBaseObjectItemClickable)
+  TEWDropDownItem = class(TCollectionItem)
   private
-    FItems: TStrings;
-    FItemIndex: integer;
-    FOnItemClick: TEWClickItemEvent;
-    function GetItems: TStrings;
-    function GetOnItemClick: TEWClickItemEvent;
-    procedure SetOnItemClick(Value: TEWClickItemEvent);
-    procedure SetItems(const Value: TStrings);
-    function GetItemIndex: integer;
-    procedure SetItemIndex(Value: integer);
-    procedure OnItemsChanged(Sender: TObject);
+    FButton: TEWDropDown;
+    FText: string;
+    FEnabled: Boolean;
+    FDivider: Boolean;
+    procedure SetText(const Value: string);
+    procedure Changed;
+    procedure SetDivider(const Value: Boolean);
+    procedure SetEnabled(const Value: Boolean);
+  public
+    function GetHtml: string;
+    procedure Assign(Source: TPersistent); override;
+  published
+    constructor Create(Collection: TCollection); override;
+    property Text: string read FText write SetText;
+    property Enabled: Boolean read FEnabled write SetEnabled default True;
+    property Divider: Boolean read FDivider write SetDivider default False;
+  end;
+
+  TEWDropDownItemCollection = class(TCollection)
+  private
+    FButton: TEWDropDown;
+  protected
+    function GetItem(Index: Integer): TEWDropDownItem;
+    procedure SetItem(Index: Integer; Value: TEWDropDownItem);
+  public
+    constructor Create(ADropDown: TEWDropDown);
+    function Add: TEWDropDownItem;
+    function Insert( Index: Integer ): TEWDropDownItem;
+    property Items[index: Integer]: TEWDropDownItem read GetItem write SetItem; default;
+  end;
+
+  TEWDropDown = class(TEWButton)
+  private
+    FItems: TEWDropDownItemCollection;
+    FOnItemClick: TEWDropDownClickItemEvent;
+    FSplitButton: Boolean;
+    function GetItems: TEWDropDownItemCollection;
+    function GetOnItemClick: TEWDropDownClickItemEvent;
+    procedure SetOnItemClick(Value: TEWDropDownClickItemEvent);
+    procedure SetItems(const Value: TEWDropDownItemCollection);
+    procedure SetSplitButton(const Value: Boolean);
   protected
 
     procedure GetEventListners(AListners: TStrings); override;
     function GetHtml: string; override;
     procedure BuildCss(AProperties: TStrings); override;
-    property ItemIndex: integer read GetItemIndex write SetItemIndex;
     procedure DoEvent(AParams: TStrings); override;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
-    property Items: TStrings read GetItems write SetItems;
-    property OnItemClick: TEWClickItemEvent read GetOnItemClick write SetOnItemClick;
+    property Items: TEWDropDownItemCollection read GetItems write SetItems;
+    property SplitButton: Boolean read FSplitButton write SetSplitButton default False;
+    property OnItemClick: TEWDropDownClickItemEvent read GetOnItemClick write SetOnItemClick;
+
   end;
 
   TEWButtonGroup = class(TEWButton, IEWBaseObjectItemClickable)
@@ -63,12 +104,14 @@ type
     FItems: TStrings;
     FOnItemClick: TEWClickItemEvent;
     FItemIndex: integer;
+    FLayout: TEWButtonGroupLayout;
     function GetItems: TStrings;
     function GetOnItemClick: TEWClickItemEvent;
     procedure SetOnItemClick(Value: TEWClickItemEvent);
     procedure SetItems(const Value: TStrings);
     function GetItemIndex: integer;
     procedure SetItemIndex(Value: integer);
+    procedure SetLayout(const Value: TEWButtonGroupLayout);
   protected
     procedure DoClick(AParams: TStrings); override;
     function GetHtml: string; override;
@@ -79,13 +122,14 @@ type
     destructor Destroy; override;
   published
     property Items: TStrings read GetItems write SetItems;
+    property Layout: TEWButtonGroupLayout read FLayout write SetLayout default bgHorizontal;
     property ItemIndex: integer read GetItemIndex write SetItemIndex;
     property OnItemClick: TEWClickItemEvent read GetOnItemClick write SetOnItemClick;
   end;
 
 implementation
 
-uses Types, VCL.Graphics, SysUtils;
+uses System.Types, VCL.Graphics, SysUtils, System.UITypes;
 
 
 { TEWButton }
@@ -99,6 +143,7 @@ end;
 constructor TEWButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FBadge := TEWBadge.Create(Self);
   FButtonType := btSecondary;
 end;
 
@@ -107,32 +152,45 @@ begin
   Result := Text;
 end;
 
+destructor TEWButton.Destroy;
+begin
+  FBadge.Free;
+  inherited;
+end;
+
 function TewButton.GetButtonType: TewButtonType;
 begin
   Result := FButtonType;
 end;
 
 function TEWButton.GetButtonTypeStr: string;
+var
+  AStyle: string;
 begin
+  AStyle := 'btn';
+  if FOutline then
+    AStyle := 'btn-outline';
   case FButtonType of
     btBasic:      Result := 'btn';
-    btDefault:    Result := 'btn btn-default';
-    btPrimary:    Result := 'btn btn-primary';
-    btSecondary:  Result := 'btn btn-secondary';
-    btSuccess:    Result := 'btn btn-success';
-    btDanger:     Result := 'btn btn-danger';
-    btWarning:    Result := 'btn btn-warning';
-    btInfo:       Result := 'btn btn-info';
-    btLight:      Result := 'btn btn-light';
-    btDark:       Result := 'btn btn-dark';
-    btLink:       Result := 'btn btn-link';
+    btDefault:    Result := 'btn '+AStyle+'-default';
+    btPrimary:    Result := 'btn '+AStyle+'-primary';
+    btSecondary:  Result := 'btn '+AStyle+'-secondary';
+    btSuccess:    Result := 'btn '+AStyle+'-success';
+    btDanger:     Result := 'btn '+AStyle+'-danger';
+    btWarning:    Result := 'btn '+AStyle+'-warning';
+    btInfo:       Result := 'btn '+AStyle+'-info';
+    btLight:      Result := 'btn '+AStyle+'-light';
+    btDark:       Result := 'btn '+AStyle+'-dark';
+    btLink:       Result := 'btn '+AStyle+'-link';
   end;
 end;
 
 function TEWButton.GetHtml: string;
 begin
   inherited;
-  Result := '<div name="' + Name + '" id="'+Name+'" '+GetCss+'><button style="height:100%;width:100%;"  type="button" class="' +GetButtonTypeStr + '">' + FText + '</button></div>';
+  Result := '<div name="' + Name + '" id="'+Name+'" '+GetCss+'><button style="height:100%;width:100%;"  type="button" class="' +GetButtonTypeStr + '">' + FText +
+  FBadge.Html+
+  '</button></div>';
 end;
 
 function TEWButton.GetText: string;
@@ -170,13 +228,20 @@ begin
     Canvas.Font.Color := clWebDodgerBlue;
   end;
 
+  if FOutline then
+  begin
+    Canvas.Font.Color := Canvas.Brush.Color;
+    Canvas.Pen.Color := Canvas.Brush.Color;
+    Canvas.Brush.Style := bsClear;
+  end;
+
   if FButtonType = btSuccess then
   begin
     Canvas.Brush.Color := clWebForestGreen;
     Canvas.Font.Color := clWhite;
   end;
 
-  Canvas.Pen.Style := psClear;
+  //Canvas.Pen.Style := psClear;
   Canvas.RoundRect(ClientRect, 6, 6);
   ARect := ClientRect;
   AText := Text;
@@ -191,6 +256,20 @@ begin
     FButtonType := Value;
     Changed;
   end;
+end;
+
+procedure TEWButton.SetOutline(const Value: Boolean);
+begin
+  if FOutline <> Value then
+  begin
+    FOutline := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWButton.SetBadge(const Value: TEWBadge);
+begin
+  FBadge.Assign(Value);
 end;
 
 procedure TEWButton.SetBorderRadius(const Value: integer);
@@ -222,9 +301,8 @@ end;
 constructor TEWDropDown.Create(AOwner: TComponent);
 begin
   inherited;
-  FItems := TStringList.Create;
-  FItemIndex := -1;
-  TStringLisT(FItems).OnChange := OnItemsChanged;
+  FItems := TEWDropDownItemCollection.Create(Self);
+  FSplitButton := False;
 end;
 
 destructor TEWDropDown.Destroy;
@@ -241,7 +319,10 @@ begin
   if Assigned(FOnItemClick) then
   begin
     AIndex := StrToInt(AParams.Values['index']);
-    FOnItemClick(Self, FItems[AIndex], AIndex);
+    if FItems[AIndex].Enabled then
+    begin
+      FOnItemClick(Self, FItems[AIndex], AIndex);
+    end;
   end;
 end;
 
@@ -260,52 +341,60 @@ end;
 function TEWDropDown.GetHtml: string;
 var
   ICount: integer;
+  ASplit: string;
 begin
   inherited;
-  Result := '<div id="'+Name+'" '+GetCss+'button class="' +
-    GetButtonTypeStr +
-    ' dropdown-toggle" style="width:100%;height:100%;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
-    + '  ' + Text + '</button>'+
-    '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
-  for ICount := 0 to FItems.Count - 1 do
-    Result := Result + '<a class="dropdown-item" id="'+Name+'Item'+ICount.ToString+'" href="#">' + FItems[ICount] + '</a>';
-  Result := Result + '</div></div>';
-end;
+  ASplit := '';
+  if FSplitButton then
+    ASplit := 'dropdown-toggle-split';
 
-function TEWDropDown.GetItemIndex: integer;
+Result := '<div id="'+Name+'" class="btn-group" '+GetCss+'> ';
+if FSplitButton then
 begin
-  Result := FItemIndex;
+  Result := Result + '<button type="button" class="'+GetButtonTypeStr+'">'+FText+'</button>'+
+  '  <button class="'+GetButtonTypeStr+' dropdown-toggle '+ASplit+'" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+end
+else
+  Result := Result + '  <button class="'+GetButtonTypeStr+' dropdown-toggle '+ASplit+'" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+FText;
+
+Result := Result + '  </button>'+
+'  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+  for ICount := 0 to FItems.Count - 1 do
+  begin
+    Result :=Result + FItems[ICount].GetHtml;
+  end;
+  Result := Result + '  </div>'+'</div>';
 end;
 
-function TEWDropDown.GetItems: TStrings;
+
+function TEWDropDown.GetItems: TEWDropDownItemCollection;
 begin
   Result := FItems;
 end;
 
-function TEWDropDown.GetOnItemClick: TEWClickItemEvent;
+function TEWDropDown.GetOnItemClick: TEWDropDownClickItemEvent;
 begin
   Result := FOnItemClick;
 end;
 
-procedure TEWDropDown.OnItemsChanged(Sender: TObject);
-begin
-  Changed;
-end;
-
-procedure TEWDropDown.SetItemIndex(Value: integer);
-begin
-  //
-end;
-
-procedure TEWDropDown.SetItems(const Value: TStrings);
+procedure TEWDropDown.SetItems(const Value: TEWDropDownItemCollection);
 begin
   FItems.Assign(Value);
   Changed;
 end;
 
-procedure TEWDropDown.SetOnItemClick(Value: TEWClickItemEvent);
+procedure TEWDropDown.SetOnItemClick(Value: TEWDropDownClickItemEvent);
 begin
   FOnItemClick := Value;
+end;
+
+procedure TEWDropDown.SetSplitButton(const Value: Boolean);
+begin
+  if FSplitButton <> Value then
+  begin
+    FSplitButton := Value;
+    Changed;
+  end;
 end;
 
 { TEWButtonGroup }
@@ -316,6 +405,7 @@ constructor TEWButtonGroup.Create(AOwner: TComponent);
 begin
   inherited;
   FItems := TStringList.Create;
+  FLayout := bgHorizontal;
 end;
 
 destructor TEWButtonGroup.Destroy;
@@ -359,16 +449,19 @@ begin
   inherited;
   for ICount := 0 to FItems.Count-1 do
     AddObjectEvent(Name+'Item'+ICount.ToString, 'click', ['index='+ICount.ToString], AListners, '');
-    //AddClickItemEvent(ICount, AListners);
 end;
 
 function TEWButtonGroup.GetHtml: string;
 var
   ICount: integer;
   AActive: string;
+  AClass: string;
 begin
   inherited;
-  Result :='<div ' + GetCss +' id="'+Name+'" style="width:100%;height:100%;" class="btn-group" role="group" aria-label="Basic example">';
+  AClass := 'btn-group';
+  if FLayout = bgVertical then
+    AClass := 'btn-group-vertical';
+  Result :='<div ' + GetCss +' id="'+Name+'" style="width:100%;height:100%;" class="'+AClass+'" role="group" aria-label="Basic example">';
   for ICount := 0 to FItems.Count - 1 do
   begin
     AActive := '';
@@ -405,11 +498,116 @@ begin
   FItems.Assign(Value);
 end;
 
+procedure TEWButtonGroup.SetLayout(const Value: TEWButtonGroupLayout);
+begin
+  if FLayout <> Value then
+  begin
+    FLayout := Value;
+    Changed;
+  end;
+end;
+
 procedure TEWButtonGroup.SetOnItemClick(Value: TEWClickItemEvent);
 begin
   FOnItemClick := Value;
 end;
 
+
+{ TEWDropDownItem }
+
+procedure TEWDropDownItem.Assign(Source: TPersistent);
+begin
+  inherited;
+  Text := (Source as TEWDropDownItem).Text;
+  Enabled := (Source as TEWDropDownItem).Enabled;
+  Divider := (Source as TEWDropDownItem).Divider;
+end;
+
+procedure TEWDropDownItem.Changed;
+var
+  I: IEWBaseComponent;
+begin
+  if Supports(FButton, IEWBaseComponent, I) then
+    i.Changed;
+end;
+
+constructor TEWDropDownItem.Create(Collection: TCollection);
+begin
+  inherited;
+  FButton := TEWDropDownItemCollection(Collection).FButton;
+  FEnabled := True;
+  FDivider := False;
+end;
+
+function TEWDropDownItem.GetHtml: string;
+var
+  ADisabled: string;
+begin
+  ADisabled := '';
+  if FEnabled = False then
+    ADisabled := 'disabled';
+  if FDivider then
+    Result := '<div class="dropdown-divider"></div>'
+  else
+    Result := '<a class="dropdown-item '+ADisabled+'" id="'+FButton.Name+'Item'+Index.ToString+'" href="#">' + FText + '</a>';
+end;
+
+procedure TEWDropDownItem.SetDivider(const Value: Boolean);
+begin
+  if FDivider <> Value then
+  begin
+    FText := '';
+    FDivider := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWDropDownItem.SetEnabled(const Value: Boolean);
+begin
+  if FEnabled <> Value then
+  begin
+    FEnabled := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWDropDownItem.SetText(const Value: string);
+begin
+  if FText <> Value then
+  begin
+    FText := Value;
+    Changed;
+  end;
+end;
+
+{ TEWDropDownItemCollection }
+
+function TEWDropDownItemCollection.Add: TEWDropDownItem;
+begin
+    Result := TEWDropDownItem.Create(Self);
+end;
+
+constructor TEWDropDownItemCollection.Create(ADropDown: TEWDropDown);
+begin
+  inherited Create(TEWDropDownItem);
+  FButton := ADropDown;
+end;
+
+function TEWDropDownItemCollection.GetItem(Index: Integer): TEWDropDownItem;
+begin
+  Result := inherited Items[index] as TEWDropDownItem;
+end;
+
+function TEWDropDownItemCollection.Insert(Index: Integer): TEWDropDownItem;
+begin
+ Result := inherited insert( index ) as TEWDropDownItem;
+end;
+
+procedure TEWDropDownItemCollection.SetItem(Index: Integer;
+  Value: TEWDropDownItem);
+begin
+  inherited SetItem(index, Value);
+end;
 
 end.
 
