@@ -8,23 +8,21 @@ uses
   Vcl.Imaging.jpeg, EWImages, EWProgressBars, EWEdits, EWNavBar;
 type
   TForm53 = class(TEwForm)
-    EWLayout1: TEWLayout;
-    ewButton1: TEWButton;
-    ewButton2: TEWButton;
-    EWButton3: TEWButton;
-    ewButton4: TEWButton;
-    EWButton5: TEWButton;
-    EWLayout2: TEWLayout;
+    EWLayoutGrid1: TEWLayoutGrid;
+    EWButton6: TEWButton;
+    EWButton7: TEWButton;
+    EWButton8: TEWButton;
+    EWButton9: TEWButton;
+    EWButton10: TEWButton;
+    EWLayoutGrid2: TEWLayoutGrid;
     EWImage1: TEWImage;
     EWImage2: TEWImage;
     EWImage3: TEWImage;
-    EWLayout3: TEWLayout;
+    EWLayoutGrid3: TEWLayoutGrid;
     EWProgressBar1: TEWProgressBar;
+    EWProgressBar4: TEWProgressBar;
     EWProgressBar2: TEWProgressBar;
     EWProgressBar3: TEWProgressBar;
-    EWProgressBar4: TEWProgressBar;
-    procedure ewButton1Click(Sender: TObject);
-    procedure EWButton3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -38,17 +36,6 @@ implementation
 
 {$R *.dfm}
 
-
-procedure TForm53.ewButton1Click(Sender: TObject);
-begin
-  EWImage1.Visible := not EWImage1.Visible;
-end;
-
-procedure TForm53.EWButton3Click(Sender: TObject);
-begin
-  EWLayout1.Margin := 12;
-
-end;
 
 initialization
 

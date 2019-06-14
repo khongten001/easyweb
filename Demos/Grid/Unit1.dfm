@@ -1,75 +1,80 @@
 object Form53: TForm53
   Left = 0
   Top = 0
-  Width = 636
+  Width = 1049
   Height = 397
   Color = clBtnFace
   PixelsPerInch = 96
   TextHeight = 13
-  object EWLayout1: TEWLayout
+  object EWLayoutGrid1: TEWLayoutGrid
     Left = 0
     Top = 0
-    Width = 620
-    Height = 49
-    object ewButton1: TEWButton
+    Width = 1033
+    Height = 64
+    ExplicitTop = -6
+    object EWButton6: TEWButton
       Left = 0
       Top = 0
       Width = 100
-      Height = 49
-      OnClick = ewButton1Click
+      Height = 64
       Align = alLeft
       ButtonType = btWarning
       Text = 'EWButton1'
+      ExplicitLeft = 8
     end
-    object ewButton2: TEWButton
-      Left = 200
-      Top = 0
-      Width = 100
-      Height = 49
-      Align = alLeft
-      ButtonType = btPrimary
-      Text = 'EWButton1'
-    end
-    object EWButton3: TEWButton
+    object EWButton7: TEWButton
       Left = 100
       Top = 0
       Width = 100
-      Height = 49
-      OnClick = EWButton3Click
+      Height = 64
       Align = alLeft
       ButtonType = btSuccess
       Text = 'EWButton1'
+      ExplicitLeft = 108
     end
-    object ewButton4: TEWButton
-      Left = 400
+    object EWButton8: TEWButton
+      Left = 200
       Top = 0
       Width = 100
-      Height = 49
+      Height = 64
       Align = alLeft
-      ButtonType = btDanger
+      ButtonType = btPrimary
       Text = 'EWButton1'
+      ExplicitLeft = 208
     end
-    object EWButton5: TEWButton
+    object EWButton9: TEWButton
       Left = 300
       Top = 0
       Width = 100
-      Height = 49
+      Height = 64
       Align = alLeft
       ButtonType = btInfo
       Text = 'EWButton1'
+      ExplicitLeft = 308
+    end
+    object EWButton10: TEWButton
+      Left = 400
+      Top = 0
+      Width = 100
+      Height = 64
+      Align = alLeft
+      ButtonType = btDanger
+      Text = 'EWButton1'
+      ExplicitLeft = 408
     end
   end
-  object EWLayout2: TEWLayout
+  object EWLayoutGrid2: TEWLayoutGrid
     Left = 0
-    Top = 49
-    Width = 620
-    Height = 107
-    ExplicitTop = 94
+    Top = 64
+    Width = 1033
+    Height = 97
+    ExplicitTop = 200
+    ExplicitWidth = 620
     object EWImage1: TEWImage
       Left = 0
       Top = 0
       Width = 100
-      Height = 107
+      Height = 97
       Align = alLeft
       Picture.Data = {
         0A544A504547496D616765C65B0000FFD8FFE000104A46494600010101004800
@@ -807,12 +812,13 @@ object Form53: TForm53
         94BC272BB0EF29EF8917A95F0C8BE63514D35EC65A39B0F8BEE0B4739D3864DD
         58FF00A6E77FE16D686BE0A4D57D98F1380C8C72AE537B38B7774EAA7514B6F9
         1B5F06221E2392E63F23DE5F6356A993728FD1FFD9}
+      ExplicitLeft = 8
     end
     object EWImage2: TEWImage
       Left = 100
       Top = 0
       Width = 100
-      Height = 107
+      Height = 97
       Align = alLeft
       Picture.Data = {
         0A544A504547496D616765629F0000FFD8FFE000104A46494600010101004800
@@ -2091,12 +2097,13 @@ object Form53: TForm53
         C8ADB7C29E20C15B590666F782418F614278F30DD59695A4A428742318BCF4EE
         8DE41E8B2B9E22D71057170DF1E53CEF89D76951C52BE337050E79CD045B1A46
         0BC5D246CB38ABB617C4CF8D96257FFFD9}
+      ExplicitLeft = 108
     end
     object EWImage3: TEWImage
       Left = 200
       Top = 0
       Width = 100
-      Height = 107
+      Height = 97
       Align = alLeft
       Picture.Data = {
         0A544A504547496D61676514620000FFD8FFE000104A46494600010101006000
@@ -2885,18 +2892,22 @@ object Form53: TForm53
         DD0249F77643E82802062901A0032C6E92221E68848CA085CEFB1FF71D8D2680
         2607B03810E60C79BCEC0E0E3B13D77A400B3C7144C0412EA0479B6DB3EBB534
         07FFD9}
+      ExplicitLeft = 208
     end
   end
-  object EWLayout3: TEWLayout
+  object EWLayoutGrid3: TEWLayoutGrid
     Left = 0
-    Top = 156
-    Width = 620
-    Height = 29
+    Top = 161
+    Width = 1033
+    Height = 41
+    ExplicitLeft = 432
+    ExplicitTop = 336
+    ExplicitWidth = 100
     object EWProgressBar1: TEWProgressBar
-      Left = 600
+      Left = 200
       Top = 0
       Width = 200
-      Height = 29
+      Height = 41
       Align = alLeft
       Animated = True
       Max = 100
@@ -2904,41 +2915,13 @@ object Form53: TForm53
       Position = 50
       Striped = True
       Style = btSuccess
-      ExplicitHeight = 45
-    end
-    object EWProgressBar2: TEWProgressBar
-      Left = 200
-      Top = 0
-      Width = 200
-      Height = 29
-      Align = alLeft
-      Animated = True
-      Max = 100
-      Min = 0
-      Position = 50
-      Striped = True
-      Style = btInfo
-      ExplicitHeight = 45
-    end
-    object EWProgressBar3: TEWProgressBar
-      Left = 0
-      Top = 0
-      Width = 200
-      Height = 29
-      Align = alLeft
-      Animated = True
-      Max = 100
-      Min = 0
-      Position = 50
-      Striped = True
-      Style = btDefault
-      ExplicitHeight = 45
+      ExplicitLeft = 8
     end
     object EWProgressBar4: TEWProgressBar
-      Left = 400
+      Left = 600
       Top = 0
       Width = 200
-      Height = 29
+      Height = 41
       Align = alLeft
       Animated = True
       Max = 100
@@ -2946,7 +2929,35 @@ object Form53: TForm53
       Position = 50
       Striped = True
       Style = btDanger
-      ExplicitHeight = 45
+      ExplicitLeft = 208
+    end
+    object EWProgressBar2: TEWProgressBar
+      Left = 400
+      Top = 0
+      Width = 200
+      Height = 41
+      Align = alLeft
+      Animated = True
+      Max = 100
+      Min = 0
+      Position = 50
+      Striped = True
+      Style = btInfo
+      ExplicitLeft = 208
+    end
+    object EWProgressBar3: TEWProgressBar
+      Left = 0
+      Top = 0
+      Width = 200
+      Height = 41
+      Align = alLeft
+      Animated = True
+      Max = 100
+      Min = 0
+      Position = 50
+      Striped = True
+      Style = btDefault
+      ExplicitLeft = 8
     end
   end
 end

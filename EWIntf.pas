@@ -130,6 +130,10 @@ type
     ['{94056032-0A61-443A-A354-94668A118032}']
   end;
 
+  IEWLayoutGrid = interface
+    ['{135D1656-1DFA-4AAD-BC6C-CA6559F8F4F7}']
+  end;
+
   IEWTimer = interface
     ['{A694881C-5FD0-458E-9964-23E5B3D2CD40}']
     procedure DoTimer;

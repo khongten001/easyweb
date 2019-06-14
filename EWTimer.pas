@@ -13,7 +13,7 @@ type
     procedure SetActive(const Value: Boolean);
     procedure SetInterval(const Value: integer);
   protected
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     function GetScript: string; override;
     procedure GetGlobalVars(AStrings: TStrings); override;
     procedure DoEvent(APArams: TStrings); override;
@@ -56,7 +56,7 @@ begin
   AStrings.Add('var timer'+Name+';');
 end;
 
-function TEWTimer.GetHtml: string;
+function TEWTimer.GenerateHtml: string;
 var
   AScript: string;
 begin

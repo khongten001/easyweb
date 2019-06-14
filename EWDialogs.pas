@@ -16,7 +16,7 @@ type
     procedure DoConfirm(AResult: Boolean);
     procedure DoPrompt(AValue: string);
   protected
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     function GetScript: string; override;
     procedure DoEvent(AParams: TStrings); override;
 
@@ -69,9 +69,8 @@ begin
   if AType = 'prompt' then DoPrompt(AParams.Values['value']);
 end;
 
-function TEWDialog.GetHtml: string;
+function TEWDialog.GenerateHtml: string;
 begin
-  inherited;
   Result := '<div id="'+Name+'"></div>';
 end;
 

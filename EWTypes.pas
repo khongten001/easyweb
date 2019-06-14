@@ -20,16 +20,38 @@ type
 
   TEWImageShape = (isDefault, isRoundedCorners, isCircle, isThumbnail);
 
-  TEWFontVariant = (fvSmallCaps);
+  TEWFontVariant = (fvNormal, fvSmallCaps);
 
   TEWInputType = (itDate, itDateTime, itEmail, itHidden, itMonthYear, itNumber, itPassword, itText, itTime, itUrl);
 
-  //TEWFontFamily = type string;
+  TEWPadding = class(TPersistent)
+  private
+    FLeft: integer;
+    FTop: integer;
+    FRight: integer;
+    FBottom: integer;
+    FOnChange: TNotifyEvent;
+    function GetAsCssProperty: string;
+    procedure Changed;
+    procedure SetBottom(const Value: integer);
+    procedure SetLeft(const Value: integer);
+    procedure SetRight(const Value: integer);
+    procedure SetTop(const Value: integer);
+  public
+    constructor Create(AOnChange: TNotifyEvent);
+    procedure Assign(Source: TPersistent); override;
+    property AsCssProperty: string read GetAsCssProperty;
+  published
+    property Left: integer read FLeft write SetLeft default 0;
+    property Top: integer read FTop write SetTop default 0;
+    property Right: integer read FRight write SetRight default 0;
+    property Bottom: integer read FBottom write SetBottom default 0;
+  end;
 
   TEWFont = class(TPersistent)
   private
     FFamily: string;
-    FVariant: string;
+    FVariant: TEWFontVariant;
     FSize: integer;
     FStyle: TFontStyles;
     FColor: TColor;
@@ -39,20 +61,20 @@ type
     procedure SetSize(const Value: integer);
     procedure SetStyle(const Value: TFontStyles);
     procedure Changed;
-    procedure SetVariant(const Value: string);
+    procedure SetVariant(const Value: TEWFontVariant);
     function GetAsCssProperty: string;
   protected
-    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   public
-    constructor Create;
+    constructor Create(AOnChange: TNotifyEvent);
     procedure Assign(Source: TPersistent); override;
     property AsCssProperty: string read GetAsCssProperty;
   published
     property Family: string read FFamily write SetFamily;
-    property Variant: string read FVariant write SetVariant;
+    property Variant: TEWFontVariant read FVariant write SetVariant;
     property Size: integer read FSize write SetSize;// default 12;
     property Style: TFontStyles read FStyle write SetStyle;
     property Color: TColor read FColor write SetColor;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
 
@@ -60,7 +82,7 @@ type
 
 implementation
 
-uses Windows, SysUtils, GraphUtil;
+uses Windows, SysUtils;
 
 function ColorToHex( Color : TColor ): string;
 begin
@@ -68,14 +90,6 @@ begin
             IntToHex( GetRValue( Color ), 2 ) +
             IntToHex( GetGValue( Color ), 2 ) +
             IntToHex( GetBValue( Color ), 2 );
-end;
-
-function DarkenColor(AColor: TColor): TColor;
-var
-  H, S, L: Word;
-begin
-  ColorRGBToHLS(AColor, H, L, S);
-  Result := ColorHLSToRGB(H, 100, S);
 end;
 
 { TEWFont }
@@ -95,9 +109,10 @@ begin
     FOnChange(Self);
 end;
 
-constructor TEWFont.Create;
+constructor TEWFont.Create(AOnChange: TNotifyEvent);
 begin
-  inherited;
+  inherited Create;;
+  FOnChange := AOnChange;
 end;
 
 function TEWFont.GetAsCssProperty: string;
@@ -107,10 +122,12 @@ begin
   if (fsBold in FStyle) then Result := Result + 'bold ';
   if (fsItalic in FStyle) then Result := Result + 'italic ';
   if (fsUnderline in FStyle) then Result := Result + 'underline ';
-  Result := Result + FVariant+' ';
+  //Result := Result + FVariant+' ';
+
   Result := Result + FSize.ToString+'px ';
   Result := Result + FFamily+' ';
   Result := Trim(StringReplace(Result, '  ', ' ', [rfReplaceAll]));
+  if FVariant = fvSmallCaps then Result := Result + ';font-variant:small-caps;';
 end;
 
 procedure TEWFont.SetColor(const Value: TColor);
@@ -150,11 +167,81 @@ begin
 end;
 
 
-procedure TEWFont.SetVariant(const Value: string);
+procedure TEWFont.SetVariant(const Value: TEWFontVariant);
 begin
   if FVariant <> Value then
   begin
     FVariant := Value;
+    Changed;
+  end;
+end;
+
+{ TEWPadding }
+
+procedure TEWPadding.Assign(Source: TPersistent);
+begin
+  Left := (Source as TEWPadding).Left;
+  Top := (Source as TEWPadding).Top;
+  Right := (Source as TEWPadding).Right;
+  Bottom := (Source as TEWPadding).Bottom;
+end;
+
+procedure TEWPadding.Changed;
+begin
+  if Assigned(FOnChange) then
+    FOnChange(Self);
+end;
+
+constructor TEWPadding.Create(AOnChange: TNotifyEvent);
+begin
+  inherited Create;
+  FLeft := 0;
+  FTop := 0;
+  FRight := 0;
+  FBottom := 0;
+  FOnChange := AOnChange;
+end;
+
+function TEWPadding.GetAsCssProperty: string;
+begin
+  Result := '';
+  if (FLeft = 0) and (FTop = 0) and (FRight = 0) and (FBottom = 0) then
+    Exit;
+  Result := Format('padding: %dpx %dpx %dpx %dpx', [FTop, FRight, FBottom, FLeft]);
+end;
+
+procedure TEWPadding.SetBottom(const Value: integer);
+begin
+  if FBottom <> Value then
+  begin
+    FBottom := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWPadding.SetLeft(const Value: integer);
+begin
+  if FLeft <> Value then
+  begin
+    FLeft := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWPadding.SetRight(const Value: integer);
+begin
+  if FRight <> Value then
+  begin
+    FRight := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWPadding.SetTop(const Value: integer);
+begin
+  if FTop <> Value then
+  begin
+    FTop := Value;
     Changed;
   end;
 end;

@@ -6,20 +6,17 @@ interface
 uses Classes, VCL.Controls, EWIntf, EWBase, EWTypes;
 
 type
-  TEWEdit = class(TEWBaseObject, IEWInput)
+  TEWBaseEdit = class(TEWBaseObject, IEWInput)
   private
     FText: string;
     FPlaceHolder: string;
-    FInputType: TEWInputType;
     FOnExit: TNotifyEvent;
     FOnEnter: TNotifyEvent;
     FOnKeyDown: TEWKeyEvent;
     FOnKeyUp: TEWKeyEvent;
 
     function GetText: string;
-    function GetInputTypeStr: string;
     procedure SetText(const Value: string);
-    procedure SetInputType(const Value: TEWInputType);
   protected
     procedure GetEventListners(AListners: TStrings); override;
     procedure DoOnEnter;
@@ -35,35 +32,76 @@ type
     function GetPlaceHolder: string;
     procedure SetPlaceHolder(const AText: string);
     procedure Paint; override;
-    function GetHtml: string; override;
-  public
-    constructor Create(AOwner: TComponent); override;
-  published
-    property Align;
-    property InputType: TEWInputType read FInputType write SetInputType default itText;
-    property PlaceHolder: string read GetPlaceHolder write SetPlaceHolder;
-    property Text: string read GetText write SetText;
     property OnChange;
     property OnKeyDown: TEWKeyEvent read FOnKeyDown write FOnKeyDown;
     property OnKeyUp: TEWKeyEvent read FOnKeyUp write FOnKeyUp;
+  public
+  published
+    property Align;
+    property PlaceHolder: string read GetPlaceHolder write SetPlaceHolder;
+    property Text: string read GetText write SetText;
     property OnEnter: TNotifyEvent read FOnEnter write FOnEnter;
     property OnExit: TNotifyEvent read FOnExit write FOnExit;
 
+  end;
+
+  TEWEdit = class(TEWBaseEdit)
+  private
+    FInputType: TEWInputType;
+    function GetInputTypeStr: string;
+    procedure SetInputType(const Value: TEWInputType);
+    function GetTag: string;
+  protected
+    procedure GetEventListners(AListners: TStrings); override;
+    function GenerateHtml: string; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property InputType: TEWInputType read FInputType write SetInputType default itText;
+    property OnKeyDown;
+    property OnKeyUp;
+    property OnChange;
+  end;
+
+  TEWMemo = class(TEWBaseEdit)
+  private
+
+
+  protected
+    procedure GetEventListners(AListners: TStrings); override;
+    function GenerateHtml: string; override;
+  published
+
+  end;
+
+  TEWComboBox = class(TEWBaseEdit)
+  private
+    FItems: TStrings;
+    FItemIndex: integer;
+    procedure DoChange;
+    procedure SetItems(const Value: TStrings);
+    procedure SetItemIndex(const Value: integer);
+  protected
+    procedure GetEventListners(AListners: TStrings); override;
+    function GenerateHtml: string; override;
+    procedure DoEvent(AParams: TStrings); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+  published
+    property Items: TStrings read FItems write SetItems;
+    property ItemIndex: integer read FItemIndex write SetItemIndex;
+    property OnChange;
   end;
 
 implementation
 
 uses System.Types, VCL.Graphics, SysUtils;
 
-{ TEWEdit }
+{ TEWBaseEdit }
 
-constructor TEWEdit.Create(AOwner: TComponent);
-begin
-  inherited;
-  FInputType := itText;
-end;
-
-function TEWEdit.DesignTimeCaption: string;
+function TEWBaseEdit.DesignTimeCaption: string;
 begin
   Result := Text;
   if Result = '' then
@@ -72,7 +110,7 @@ begin
     Result := Name;
 end;
 
-procedure TEWEdit.DoEvent(AParams: TStrings);
+procedure TEWBaseEdit.DoEvent(AParams: TStrings);
 var
   AEvent: string;
 begin
@@ -84,57 +122,69 @@ begin
   if AEvent = 'keyup' then DoOnKeyUp(AParams);
 end;
 
-procedure TEWEdit.DoOnChange(AParams: TStrings);
+procedure TEWBaseEdit.DoOnChange(AParams: TStrings);
 begin
   FText := AParams.Values['value'];
   inherited DoOnChange(AParams);
 end;
 
-procedure TEWEdit.DoOnEnter;
+procedure TEWBaseEdit.DoOnEnter;
 begin
   if Assigned(FOnEnter) then
     FOnEnter(Self);
 end;
 
-procedure TEWEdit.DoOnExit;
+procedure TEWBaseEdit.DoOnExit;
 begin
   if Assigned(FOnEnter) then
     FOnExit(Self);
 end;
 
-procedure TEWEdit.DoOnKeyDown(AParams: TStrings);
+procedure TEWBaseEdit.DoOnKeyDown(AParams: TStrings);
 begin
   if Assigned(FOnKeyDown) then
     FOnKeyDown(Self, StrToInt(AParams.Values['value']));
 end;
 
-procedure TEWEdit.DoOnKeyPress(AParams: TStrings);
+procedure TEWBaseEdit.DoOnKeyPress(AParams: TStrings);
 begin
   FText := AParams.Values['value'];
   if Assigned(OnChange) then
     OnChange(Self);
 end;
 
-procedure TEWEdit.DoOnKeyUp(AParams: TStrings);
+procedure TEWBaseEdit.DoOnKeyUp(AParams: TStrings);
 begin
   if Assigned(FOnKeyUp) then
     FOnKeyUp(Self, StrToInt(AParams.Values['value']));
 end;
 
-procedure TEWEdit.GetEventListners(AListners: TStrings);
+procedure TEWBaseEdit.GetEventListners(AListners: TStrings);
 begin
   inherited;
   if Assigned(FOnKeyDown) then AddOnKeyDownEvent(AListners);
-  if Assigned(OnChange) then AddOnKeyPressEvent(AListners);
   if Assigned(FOnKeyUp) then AddOnKeyUpEvent(AListners);
   if Assigned(FOnEnter) then AddEnterEvent(AListners);
   if Assigned(FOnExit) then AddExitEvent(AListners);
 end;
 
-function TEWEdit.GetHtml: string;
+
+
+constructor TEWEdit.Create(AOwner: TComponent);
 begin
   inherited;
-  Result := '<input id="' + Name + '"'+GetCss+' type="'+GetInputTypeStr+'" '+
+  FInputType := itText;
+end;
+
+procedure TEWEdit.GetEventListners(AListners: TStrings);
+begin
+  inherited;
+  if Assigned(OnChange) then AddOnKeyPressEvent(AListners);
+end;
+
+function TEWEdit.GenerateHtml: string;
+begin
+  Result := '<'+GetTag+' id="' + Name + '"'+GetCss+' type="'+GetInputTypeStr+'"'+
             'class="form-control" placeholder="' + FPlaceHolder + '" '+
             'value="' + FText + '" ">';
 end;
@@ -155,17 +205,17 @@ begin
   end;
 end;
 
-function TEWEdit.GetPlaceHolder: string;
+function TEWBaseEdit.GetPlaceHolder: string;
 begin
   Result := FPlaceHolder;
 end;
 
-function TEWEdit.GetText: string;
+function TEWBaseEdit.GetText: string;
 begin
   Result := FText;
 end;
 
-procedure TEWEdit.Paint;
+procedure TEWBaseEdit.Paint;
 var
   ARect: TRect;
   AText: string;
@@ -180,6 +230,11 @@ begin
   Canvas.TextRect(ARect, AText, [tfVerticalCenter, tfSingleLine]);
 end;
 
+function TEWEdit.GetTag: string;
+begin
+  Result := 'input';
+end;
+
 procedure TEWEdit.SetInputType(const Value: TEWInputType);
 begin
   if FInputType <> Value then
@@ -189,7 +244,7 @@ begin
   end;
 end;
 
-procedure TEWEdit.SetPlaceHolder(const AText: string);
+procedure TEWBaseEdit.SetPlaceHolder(const AText: string);
 begin
   if AText <> FPlaceHolder then
   begin
@@ -198,7 +253,7 @@ begin
   end;
 end;
 
-procedure TEWEdit.SetText(const Value: string);
+procedure TEWBaseEdit.SetText(const Value: string);
 begin
   if FText <> Value then
   begin
@@ -209,5 +264,94 @@ begin
   end;
 end;
 
+
+{ TEWMemo }
+
+procedure TEWMemo.GetEventListners(AListners: TStrings);
+begin
+  inherited;
+  if Assigned(OnChange) then AddOnKeyPressEvent(AListners);
+end;
+
+function TEWMemo.GenerateHtml: string;
+begin
+  Result := '<textarea id="' + Name + '"'+GetCss+' '+
+            'class="form-control" cols="80" rows="5">'+
+            FText+
+            '</textarea>';
+end;
+
+
+{ TEWComboBox }
+
+constructor TEWComboBox.Create(AOwner: TComponent);
+begin
+  inherited;
+  FItems := TStringList.Create;
+end;
+
+destructor TEWComboBox.Destroy;
+begin
+  FItems.Free;
+  inherited;
+end;
+
+procedure TEWComboBox.DoChange;
+begin
+  if Assigned(OnChange) then
+    OnChange(Self);
+end;
+
+procedure TEWComboBox.DoEvent(AParams: TStrings);
+var
+  AEvent: string;
+begin
+  inherited DoEvent(AParams);
+  AEvent := AParams.Values['event'];
+  if AEvent = 'change' then
+  begin
+    FItemIndex := StrToIntDef(AParams.Values['value'], -1);
+    DoChange;
+  end;
+end;
+
+procedure TEWComboBox.GetEventListners(AListners: TStrings);
+begin
+  inherited;
+  if Assigned(OnChange) then AddObjectEvent(Name, 'change', [], AListners, 'document.getElementById(''' + Name +''').selectedIndex');
+end;
+
+function TEWComboBox.GenerateHtml: string;
+var
+  ICount: integer;
+  ASelected: string;
+begin
+  inherited;
+  Result := '<select class="form-control" id="'+Name+'" '+GetCss+'>';
+  for ICount := 0 to FItems.Count-1 do
+  begin
+    ASelected := '';
+    if ICount = FItemIndex then
+      ASelected := ' selected';
+    Result := Result + '<option'+ASelected+'>'+FItems[ICount]+'</option>';
+  end;
+  Result := Result + '</select>';
+end;
+
+procedure TEWComboBox.SetItemIndex(const Value: integer);
+begin
+  if FItemIndex <> Value then
+  begin
+    FItemIndex := Value;
+    DoChange;
+    Changed;
+  end;
+end;
+
+procedure TEWComboBox.SetItems(const Value: TStrings);
+begin
+  FItems.Assign(Value);
+  Changed;
+end;
 
 end.

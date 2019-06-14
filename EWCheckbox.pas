@@ -15,7 +15,7 @@ type
     procedure SetText(const Value: string);
   protected
     function DesignTimeCaption: string; override;
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     procedure DoClick(AParams: TStrings); override;
     procedure AddClickEvent(AEvents: TStrings); override;
   published
@@ -52,7 +52,7 @@ begin
   Result := FChecked;
 end;
 
-function TEWCheckBox.GetHtml: string;
+function TEWCheckBox.GenerateHtml: string;
 var
   AChecked: string;
 begin

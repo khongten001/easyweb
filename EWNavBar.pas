@@ -7,7 +7,7 @@ uses Classes, EWIntf, EWBase, VCL.Graphics, EWTypes;
 type
   TEWNavBar = class;
 
-  TEWNavBarStyle = (nbsDefault, nbsLight, nbsPrimary, nbsSuccess, nbsDark);
+  TEWNavBarStyle = (nbsDefault, nbsLight, nbsPrimary, nbsSuccess, nbsDark, nbsWarning, nbsDanger);
 
   TEWNavBarSearchEvent = procedure(Sender: TObject; ASearch: string) of object;
 
@@ -36,10 +36,12 @@ type
   private
     FNavBar: TEWNavBar;
     FText: string;
+    FEnabled: Boolean;
     FDropdownItems: TStrings;
     procedure SetText(const Value: string);
     procedure Changed;
     procedure SetDropDownItems(const Value: TStrings);
+    procedure SetEnabled(const Value: Boolean);
   public
     function GetHtml: string;
     procedure Assign(Source: TPersistent); override;
@@ -47,6 +49,7 @@ type
     constructor Create(Collection: TCollection); override;
     property DropdownItems: TStrings read FDropdownItems write SetDropDownItems;
     property Text: string read FText write SetText;
+    property Enabled: Boolean read FEnabled write SetEnabled default True;
   end;
 
   TEWNavBarItemCollection = class(TCollection)
@@ -81,7 +84,7 @@ type
     procedure DoItemClick(ASender: TObject; AData: string);
     procedure GetEventListners(AListners: TStrings); override;
     procedure BuildCss(AProperties: TStrings); override;
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     procedure Paint; override;
     procedure DoEvent(AParams: TStrings); override;
   public
@@ -200,13 +203,24 @@ begin
 
 end;
 
-function TEWNavBar.GetHtml: string;
+function TEWNavBar.GenerateHtml: string;
 var
   AItem: TCollectionItem;
+  ASearchBtnStyle: string;
 begin
   inherited;
-  Result := '<nav id="'+Name+'" class="navbar navbar-expand-lg justify-content-between '+GetStyleClass+'">'+
-  '<a d="'+Name+'Brand'+'" class="navbar-brand" href="#">'+FTitle+'</a>'+
+  ASearchBtnStyle := 'light';
+  if (FStyle in [nbsDefault, nbsLight]) then ASearchBtnStyle := 'dark';
+
+
+  Result := '<nav id="'+Name+'" class="navbar navbar-expand-md justify-content-between '+GetStyleClass+'">'+
+  '<a id="'+Name+'Brand'+'" class="navbar-brand" href="#">'+FTitle+'</a>'+
+  '<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#'+Name+'Toggler" aria-controls="'+Name+'Toggler" aria-expanded="false" aria-label="Toggle navigation">'+
+  '  <span class="navbar-toggler-icon"></span>'+
+  '</button>'+
+
+  '<div class="collapse navbar-collapse" id="'+Name+'Toggler">'+
+
   '<ul class="navbar-nav mr-auto">';
       for AItem in Fitems do
     Result :=Result + TEWNavBarItem(AItem).GetHtml;
@@ -215,10 +229,10 @@ begin
   begin
     Result := Result + '<form class="form-inline" onsubmit="return false;">'+
       '<input id="'+Name+'SearchInput" class="form-control mr-sm-2" type="search" placeholder="'+FSearchOptions.Placeholder+'" aria-label="Search">'+
-      '<button id="'+Name+'SearchButton" class="btn btn-outline-default my-2 my-sm-0" type="button">'+FSearchOptions.ButtonText+'</button>'+
+      '<button id="'+Name+'SearchButton" class="btn btn-outline-'+ASearchBtnStyle+' my-2 my-sm-0" type="button">'+FSearchOptions.ButtonText+'</button>'+
     '</form>';
   end;
-  Result := Result + '</nav>';
+  Result := Result + '<div></nav>';
 end;
 
 function TEWNavBar.GetStyleClass: string;
@@ -229,6 +243,8 @@ begin
     nbsPrimary: Result := 'navbar-dark bg-primary';
     nbsDark: Result := 'navbar-dark bg-dark';
     nbsSuccess: Result := 'navbar-dark bg-success';
+    nbsWarning: Result := 'navbar-light bg-warning';
+    nbsDanger: Result := 'navbar-dark bg-danger';
   end;
 end;
 
@@ -251,6 +267,8 @@ begin
     nbsPrimary: ABackground := clWebDodgerBlue;
     nbsDark: ABackground := clDkGray;
     nbsSuccess: ABackground := clGreen;
+    nbsWarning: ABackground := clWebGold;
+    nbsDanger: ABackground := clMaroon;
   end;
 
   case FStyle of
@@ -259,6 +277,8 @@ begin
     nbsPrimary: AFontColor := clWhite;
     nbsDark: AFontColor := clWhite;
     nbsSuccess: AFontColor := clWhite;
+    nbsWarning: ABackground := clWhite;
+    nbsDanger: ABackground := clWhite;
   end;
 
   Canvas.Font.Color := AFontColor;
@@ -348,6 +368,7 @@ begin
   inherited Create(Collection);
   FDropdownItems := TStringList.Create;
   FNavBar := (Collection as TEWNavBarItemCollection).FNavBar;
+  FEnabled := True;
 end;
 
 
@@ -378,6 +399,15 @@ procedure TEWNavBarItem.SetDropDownItems(const Value: TStrings);
 begin
   FDropdownItems.Assign(Value);
   Changed;
+end;
+
+procedure TEWNavBarItem.SetEnabled(const Value: Boolean);
+begin
+  if FEnabled <> Value then
+  begin
+    FEnabled := Value;
+    Changed;
+  end;
 end;
 
 procedure TEWNavBarItem.SetText(const Value: string);

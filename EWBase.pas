@@ -15,7 +15,8 @@ type
 
     procedure GetGlobalVars(AStrings: TStrings); virtual;
     procedure Changed; virtual;
-    function GetHtml: string; virtual;
+    function GetHtml: string;
+    function GenerateHtml: string; virtual;
     function GetScript: string; virtual;
     property HasChanged: Boolean read GetHasChanged;
   public
@@ -61,7 +62,8 @@ type
     procedure DoOnChange(AParams: TStrings); virtual;
     procedure SetName(const Value: TComponentName); override;
     procedure VisibleChanging; override;
-    function GetHtml: string; virtual;
+    function GetHtml: string;
+    function GenerateHtml: string; virtual;
     function DesignTimeCaption: string; virtual;
     procedure Resize; override;
     procedure BuildCss(AProperties: TStrings); virtual;
@@ -100,6 +102,11 @@ begin
   //
 end;
 
+function TEWBaseComponent.GenerateHtml: string;
+begin
+  Result := '';
+end;
+
 procedure TEWBaseComponent.GetGlobalVars(AStrings: TStrings);
 begin
   //
@@ -112,8 +119,8 @@ end;
 
 function TEWBaseComponent.GetHtml: string;
 begin
+  Result := GenerateHtml;
   FChanged := False;
-  Result := '';
 end;
 
 function TEWBaseComponent.GetName: string;
@@ -233,7 +240,7 @@ var
   l: IEWLayout;
 begin
   //AProperties.Values['border'] := 'solid red 1px';
-  if Supports(Parent, IEWLayout, l) = False then
+  if Supports(Parent, IEWLayoutGrid, l) = False then
   begin
     AProperties.Values['position'] := 'absolute';
     if Align = alNone then
@@ -346,13 +353,13 @@ begin
   if AEvent = 'contextmenu' then DoRightClick(AParams);
   if AEvent = 'mouseenter' then DoMouseEnter(AParams);
   if AEvent = 'mouseleave' then DoMouseLeave(AParams);
-  if AEvent = 'blur' then DoMouseLeave(AParams);
+  //if AEvent = 'blur' then DoMouseLeave(AParams);
 end;
 
 procedure TewBaseObject.DoMouseEnter(AParams: TStrings);
 begin
-  if FMouseOver then
-    Exit;
+  //if FMouseOver then
+  //  Exit;
   FMouseOver := True;
   if Assigned(FOnMouseEnter) then FOnMouseEnter(Self);
 
@@ -360,8 +367,8 @@ end;
 
 procedure TewBaseObject.DoMouseLeave(AParams: TStrings);
 begin
-  if FMouseOver = False then
-    Exit;
+  //if FMouseOver = False then
+  //  Exit;
   if Assigned(FOnMouseLeave) then FOnMouseLeave(Self);
   FMouseOver := False;
 end;
@@ -370,6 +377,11 @@ procedure TewBaseObject.DoOnChange(AParams: TStrings);
 begin
   if Assigned(FOnChange) then
     FOnChange(Self);
+end;
+
+function TewBaseObject.GenerateHtml: string;
+begin
+  Result := '';
 end;
 
 function TewBaseObject.GetCss: string;
@@ -406,8 +418,8 @@ end;
 
 function TewBaseObject.GetHtml: string;
 begin
+  Result := GenerateHtml;
   FChanged := False;
-  Result := '';
 end;
 
 function TewBaseObject.GetName: string;
@@ -464,7 +476,7 @@ var
   l: IEWLayout;
 begin
   inherited;
-  if Supports(Parent, IEWLayout, L) then
+  if Supports(Parent, IEWLayoutGrid, L) then
   begin
      Align := alLeft;
   end;

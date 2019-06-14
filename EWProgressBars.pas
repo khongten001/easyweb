@@ -24,7 +24,7 @@ type
     function GetStyleString: string;
     procedure SetAnimated(const Value: Boolean);
   protected
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     procedure Paint; override;
     function DesignTimeCaption: string; override;
   public
@@ -61,7 +61,7 @@ begin
   Result := FPosition.ToString+'%';
 end;
 
-function TEWProgressBar.GetHtml: string;
+function TEWProgressBar.GenerateHtml: string;
 var
   AStriped: string;
 begin

@@ -23,6 +23,7 @@ type
     EWLabel6: TEWLabel;
     EWButton3: TEWButton;
     EWEdit1: TEWEdit;
+    EWComboBox1: TEWComboBox;
     procedure EWImage1MouseEnter(Sender: TObject);
     procedure EWImage1MouseLeave(Sender: TObject);
     procedure EWImage1Click(Sender: TObject);
@@ -36,6 +37,8 @@ type
     procedure EWButton3Click(Sender: TObject);
     procedure EWDropDown1ItemClick(Sender: TObject; AItem: TCollectionItem;
       ADropDownIndex: Integer);
+    procedure EWComboBox1MouseEnter(Sender: TObject);
+    procedure EWComboBox1MouseLeave(Sender: TObject);
   private
     { Private declarations }
   public
@@ -73,6 +76,18 @@ end;
 procedure TForm1.EWCheckBox1Click(Sender: TObject);
 begin
   EWProgressBar1.Animated := EWCheckBox1.Checked;
+end;
+
+procedure TForm1.EWComboBox1MouseEnter(Sender: TObject);
+begin
+  EWLabel5.Text := 'Mouse Enter';
+
+end;
+
+procedure TForm1.EWComboBox1MouseLeave(Sender: TObject);
+begin
+  EWLabel5.Text := 'Mouse Leave';
+
 end;
 
 procedure TForm1.EWDropDown1ItemClick(Sender: TObject; AItem: TCollectionItem;

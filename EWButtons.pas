@@ -23,7 +23,7 @@ type
     procedure SetOutline(const Value: Boolean);
     procedure SetBadge(const Value: TEWBadge);
   protected
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     function DesignTimeCaption: string; override;
     procedure Paint; override;
     procedure BuildCss(AProperties: TStrings); override;
@@ -85,7 +85,7 @@ type
   protected
 
     procedure GetEventListners(AListners: TStrings); override;
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     procedure BuildCss(AProperties: TStrings); override;
     procedure DoEvent(AParams: TStrings); override;
 
@@ -114,7 +114,7 @@ type
     procedure SetLayout(const Value: TEWButtonGroupLayout);
   protected
     procedure DoClick(AParams: TStrings); override;
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     procedure DoItemClick(ASender: TObject; AItem: string; AIndex: integer);
     procedure GetEventListners(AListners: TStrings); override;
   public
@@ -185,12 +185,15 @@ begin
   end;
 end;
 
-function TEWButton.GetHtml: string;
+function TEWButton.GenerateHtml: string;
 begin
   inherited;
-  Result := '<div name="' + Name + '" id="'+Name+'" '+GetCss+'><button style="height:100%;width:100%;"  type="button" class="' +GetButtonTypeStr + '">' + FText +
+  {Result := '<div name="' + Name + '" id="'+Name+'" '+GetCss+'><button style="height:100%;width:100%;"  type="button" class="' +GetButtonTypeStr + '">' + FText +
   FBadge.Html+
-  '</button></div>';
+  '</button></div>';}
+  Result := '<button name="' + Name + '" id="'+Name+'" '+GetCss+' type="button" class="' +GetButtonTypeStr + '">' + FText +
+  FBadge.Html+
+  '</button>';
 end;
 
 function TEWButton.GetText: string;
@@ -338,7 +341,7 @@ begin
   end;
 end;
 
-function TEWDropDown.GetHtml: string;
+function TEWDropDown.GenerateHtml: string;
 var
   ICount: integer;
   ASplit: string;
@@ -451,7 +454,7 @@ begin
     AddObjectEvent(Name+'Item'+ICount.ToString, 'click', ['index='+ICount.ToString], AListners, '');
 end;
 
-function TEWButtonGroup.GetHtml: string;
+function TEWButtonGroup.GenerateHtml: string;
 var
   ICount: integer;
   AActive: string;

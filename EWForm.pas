@@ -175,12 +175,13 @@ begin
       for ICount := 0 to ComponentCount-1 do
       begin
         if Self.Components[ICount] is TEWBaseComponent then
-            Result := Result + TEWBaseComponent(Self.Components[ICount] ).Html +CR;
+          Result := Result + TEWBaseComponent(Self.Components[ICount]).Html +CR;
+
 
         if Self.Components[ICount] is TEWBaseObject then
         begin
           if TewBaseObject(Self.Components[ICount] ).Parent = Self then
-            Result := Result + TEWBaseObject(Self.Components[ICount] ).Html +CR;
+            Result := Result + TEWBaseObject(Self.Components[ICount]).Html +CR;
         end;
       end;
 

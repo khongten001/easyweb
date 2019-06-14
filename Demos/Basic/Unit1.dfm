@@ -12,6 +12,7 @@ object Form1: TForm1
     Top = 25
     Width = 217
     Height = 41
+    Font.Variant = fvNormal
     Font.Size = 20
     Font.Style = []
     Font.Color = clBlack
@@ -61,6 +62,7 @@ object Form1: TForm1
     Top = 177
     Width = 217
     Height = 41
+    Font.Variant = fvNormal
     Font.Size = 20
     Font.Style = []
     Font.Color = clBlack
@@ -587,6 +589,7 @@ object Form1: TForm1
     Top = 80
     Width = 225
     Height = 41
+    Font.Variant = fvNormal
     Font.Size = 20
     Font.Style = []
     Font.Color = clBlack
@@ -597,6 +600,7 @@ object Form1: TForm1
     Top = 353
     Width = 217
     Height = 41
+    Font.Variant = fvNormal
     Font.Size = 20
     Font.Style = []
     Font.Color = clBlack
@@ -607,6 +611,7 @@ object Form1: TForm1
     Top = 400
     Width = 225
     Height = 41
+    Font.Variant = fvNormal
     Font.Size = 20
     Font.Style = []
     Font.Color = clBlack
@@ -635,6 +640,7 @@ object Form1: TForm1
     Top = 177
     Width = 100
     Height = 41
+    Font.Variant = fvNormal
     Font.Size = 0
     Font.Style = []
     Font.Color = clBlack
@@ -655,5 +661,15 @@ object Form1: TForm1
     Width = 100
     Height = 41
     Text = ''
+  end
+  object EWComboBox1: TEWComboBox
+    Left = 320
+    Top = 472
+    Width = 100
+    Height = 41
+    OnMouseEnter = EWComboBox1MouseEnter
+    OnMouseLeave = EWComboBox1MouseLeave
+    Text = ''
+    ItemIndex = 0
   end
 end

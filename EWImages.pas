@@ -17,7 +17,7 @@ type
   protected
     procedure Changed; override;
     function GetClass: string;
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     procedure Paint; override;
     function GetPreloadUrl: string;
     procedure BuildCss(AProperties: TStrings); override;
@@ -72,7 +72,7 @@ begin
   end;
 end;
 
-function TEWImage.GetHtml: string;
+function TEWImage.GenerateHtml: string;
 var
   ASrc: string;
 begin

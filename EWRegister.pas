@@ -48,11 +48,15 @@ begin
   RegisterComponents('EasyWeb', [TEWDropDown]);
   RegisterComponents('EasyWeb', [TEWButtonGroup]);
   RegisterComponents('EasyWeb', [TEWEdit]);
+  RegisterComponents('EasyWeb', [TEWComboBox]);
+
+  RegisterComponents('EasyWeb', [TEWMemo]);
   RegisterComponents('EasyWeb', [TEWProgressBar]);
   RegisterComponents('EasyWeb', [TEWCheckBox]);
   RegisterComponents('EasyWeb', [TEWLabel]);
   RegisterComponents('EasyWeb', [TEWImage]);
   RegisterComponents('EasyWeb', [TEWLayout]);
+  RegisterComponents('EasyWeb', [TEWLayoutGrid]);
   RegisterComponents('EasyWeb', [TEWTimer]);
   RegisterComponents('EasyWeb', [TEWNavBar]);
   RegisterComponents('EasyWeb', [TEWDialog]);

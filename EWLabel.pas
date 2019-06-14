@@ -12,16 +12,18 @@ type
     FText: string;
     FVertAlignment: TVerticalAlignment;
     FFont: TEWFont;
+
     function GetText: string;
     procedure SetText(const Value: string);
     procedure SetAlignment(const Value: TAlignment);
     procedure SetVertAlignment(const Value: TVerticalAlignment);
     procedure SetBackgroundColor(const Value: TColor);
     procedure SetFont(const Value: TEWFont);
+    procedure FontChanged(Sender: TObject);
   protected
     procedure BuildCss(AProperties: TStrings); override;
     function DesignTimeCaption: string; override;
-    function GetHtml: string; override;
+    function GenerateHtml: string; override;
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -61,7 +63,7 @@ begin
   FAlignment := taLeftJustify;
   FVertAlignment := taVerticalCenter;
   FBackgroundColor := clNone;
-  FFont := TEWFont.Create;
+  FFont := TEWFont.Create(FontChanged);
 end;
 
 function TEWLabel.DesignTimeCaption: string;
@@ -78,7 +80,12 @@ begin
   inherited;
 end;
 
-function TEWLabel.GetHtml: string;
+procedure TEWLabel.FontChanged(Sender: TObject);
+begin
+  Changed;
+end;
+
+function TEWLabel.GenerateHtml: string;
 var
   ATranslate: string;
 begin
