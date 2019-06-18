@@ -40,3 +40,9 @@
 /EasyWebXE8.res
 /easyWeb.dpk.bak
 /Demos/Grid/__history
+/Source/__history
+/Source/*.tvsconfig
+/Source/*.bpl
+/Source/*.dcp
+/Demos/Table/*.res
+/Demos/Table/__history

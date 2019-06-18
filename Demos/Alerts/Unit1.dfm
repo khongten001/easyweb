@@ -21,6 +21,7 @@ object Form62: TForm62
     Width = 249
     Height = 41
     Font.Family = 'Arial, Helvetica, sans-serif'
+    Font.Variant = fvNormal
     Font.Size = 26
     Font.Style = []
     Font.Color = clBlack
@@ -50,6 +51,7 @@ object Form62: TForm62
     Width = 249
     Height = 41
     Font.Family = 'Arial, Helvetica, sans-serif'
+    Font.Variant = fvNormal
     Font.Size = 26
     Font.Style = []
     Font.Color = clBlack

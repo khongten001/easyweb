@@ -52,7 +52,7 @@ begin
   if AConfirmed then
   begin
     EWLabel1.Text := 'Ok Clicked';
-    EWLabel1.Font.Create.Color := clWebGreen;
+    EWLabel1.Font.Color := clWebGreen;
   end
   else
   begin
