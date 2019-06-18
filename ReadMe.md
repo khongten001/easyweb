@@ -18,12 +18,19 @@ By all means get involved if you'd like to help :-)
 
 I've created packages for XE8 and Delphi 10.3 (as these are the 2 environments I have installed) but it should be easy to install on anything inbetween.
 
-To install, open up the EasyWeb_XX.groupproj from the source directory which corrasponds to your Delphi version.
-Right-click on the Project Group Root node in the Project Manager and select "Build All".
-Then right-click on then EasyWebDsgn_XX (design-time) package and click on "Install".
-You'll also want to add the path of the EasyWeb source folder to your Delphi library path..
+To install... 
 
-You should then see a new "EasyWeb" category in your Delphi File->New options alond with a new EasyWeb category on your Object Inspector.
+1.  open up the EasyWeb_XX.groupproj from the source directory which corrasponds to your Delphi version.
+2.  Right-click on the Project Group Root node in the Project Manager and select "Build All".
+3.  Then right-click on then EasyWebDsgn_XX (design-time) package and click on "Install".
+4.  Add the path of the EasyWeb source folder to your Delphi library path..
+
+You should then see a new "EasyWeb" category in your Delphi File->New options along with a new EasyWeb category on your Tool Palette.
+
+
+![Integration into Delphi's New Dialog](https://kernow-s3.s3-eu-west-1.amazonaws.com/EasyWeb/FileNew.png)
+
+![Tool Palette Components](https://kernow-s3.s3-eu-west-1.amazonaws.com/EasyWeb/ToolPalette.png)
 
 ## Support the project
 
