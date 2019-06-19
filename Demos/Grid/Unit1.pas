@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EWForm, EWButtons, EWBase, EWLayout,
-  Vcl.Imaging.jpeg, EWImages, EWProgressBars, EWEdits, EWNavBar;
+  Vcl.Imaging.jpeg, EWImages, EWProgressBars, EWEdits, EWNavBar, SessionDataUnit;
 type
   TForm53 = class(TEwForm)
     EWLayoutGrid1: TEWLayoutGrid;
@@ -24,8 +24,10 @@ type
     EWProgressBar2: TEWProgressBar;
     EWProgressBar3: TEWProgressBar;
   private
+    function GetSessionData: TEWSessionData;
     { Private declarations }
   public
+    property SessionData: TEWSessionData read GetSessionData;
     { Public declarations }
   end;
 
@@ -33,9 +35,12 @@ implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
-
 {$R *.dfm}
 
+function TForm53.GetSessionData: TEWSessionData;
+begin
+  Result := (Session.DataModule as TEWSessionData);
+end;
 
 initialization
 

@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EWForm, EWBase, EWButtons, EWDialogs,
-  EWLabel;
+  EWLabel, SessionDataUnit;
 type
   TForm62 = class(TEwForm)
     EWButton1: TEWButton;
@@ -20,8 +20,11 @@ type
     procedure EWButton3Click(Sender: TObject);
     procedure EWDialog1Prompt(Sender: TObject; AValue: string);
   private
+    // switch off hints here to surpress the compiler hint of
+    function GetSessionData: TEWSessionData;
     { Private declarations }
   public
+    property SessionData: TEWSessionData read GetSessionData;
     { Public declarations }
   end;
 
@@ -30,6 +33,12 @@ implementation
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
+
+
+function TForm62.GetSessionData: TEWSessionData;
+begin
+  Result := (Session.DataModule as TEWSessionData);
+end;
 
 procedure TForm62.EWButton1Click(Sender: TObject);
 begin

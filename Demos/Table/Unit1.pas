@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EWForm, EWBase, EWEdits, EWTable,
-  EWButtons, EWLabel, EWCheckbox, EWNavBar;
+  EWButtons, EWLabel, EWCheckbox, EWNavBar, SessionDataUnit;
 type
   TForm1 = class(TEwForm)
     EWTable1: TEWTable;
@@ -24,21 +24,23 @@ type
     procedure EWCheckBox2Click(Sender: TObject);
     procedure EWButton2Click(Sender: TObject);
   private
+    function GetSessionData: TEWSessionData;
     { Private declarations }
   public
+    property SessionData: TEWSessionData read GetSessionData;
     { Public declarations }
   end;
 
-
-
 implementation
-
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
-
 {$R *.dfm}
 
+function TForm1.GetSessionData: TEWSessionData;
+begin
+  Result := (Session.DataModule as TEWSessionData);
+end;
 
 procedure TForm1.EWButton1Click(Sender: TObject);
 begin

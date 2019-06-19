@@ -29,9 +29,12 @@ interface
 uses Classes, VCL.Forms, System.Generics.Collections, EWBase;
 
 type
+  TEWSessionDataClass = class of TDataModule;
+
   TEWSession = class
   private
     FForms: TObjectList<TCustomForm>;
+    FDatamodule: TDataModule;
     FSessionID: string;
     FFormIndex: integer;
     FRequiresReload: Boolean;
@@ -41,9 +44,11 @@ type
   public
     constructor Create(ASessionID: string); virtual;
     destructor Destroy; override;
+    class procedure RegisterSessionData(ASessionData: TEWSessionDataClass);
     procedure PushForm(AForm: TCustomForm);
     procedure PopForm;
 
+    property DataModule: TDataModule read FDatamodule;
     property SessionID: string read FSessionID write SetSessionID;
     property Forms: TObjectList<TCustomForm> read FForms;
     property Html: string read GetHtml;
@@ -63,6 +68,9 @@ type
 implementation
 
 uses EWServerControllerBase, SysUtils, System.Threading, EWIntf, EWForm, EWTypes;
+
+var
+  SessionDataClass: TEWSessionDataClass;
 
 { TEWSessionList }
 
@@ -95,6 +103,7 @@ var
 begin
   inherited Create;
   FForms := TObjectList<TCustomForm>.Create(True);
+  FDatamodule := SessionDataClass.Create(nil);
   TThread.Synchronize(nil,
   procedure
   begin
@@ -112,6 +121,7 @@ end;
 destructor TEWSession.Destroy;
 begin
   FForms.Free;
+  FDatamodule.Free;
   inherited;
 end;
 
@@ -131,6 +141,12 @@ begin
   FForms.Add(AForm);
   FFormIndex := FFormIndex+1;
   FRequiresReload := True;
+end;
+
+class procedure TEWSession.RegisterSessionData(
+  ASessionData: TEWSessionDataClass);
+begin
+  SessionDataClass := ASessionData;
 end;
 
 function TEWSession.GetHtml: string;

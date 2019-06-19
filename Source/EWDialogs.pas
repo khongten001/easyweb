@@ -150,6 +150,8 @@ end;
 procedure TEWDialog.ShowMessage(AText: string);
 begin
   FPending := StringReplace(C_ALERT, '%text%', AText, []);
+  FPending := StringReplace(FPending, #10, '\n', [rfReplaceAll]);
+  FPending := StringReplace(FPending, #13, '\r', [rfReplaceAll]);
   Changed;
 end;
 

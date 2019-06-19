@@ -836,10 +836,7 @@ object Form57: TForm57
       OnMouseEnter = EWComboBox1MouseEnter
       OnMouseLeave = EWComboBox1MouseLeave
       Text = ''
-      Items.Strings = (
-        'Item 1'
-        'Item 2'
-        'Item 3')
+      Items = <>
       ItemIndex = 0
       OnChange = EWComboBox1Change
     end

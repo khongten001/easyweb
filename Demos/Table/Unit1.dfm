@@ -93,8 +93,5 @@ object Form1: TForm1
     Title = 'EasyWeb'
     SearchOptions.ButtonText = 'Search'
     SearchOptions.Placeholder = 'Search'
-    ExplicitLeft = 176
-    ExplicitTop = 208
-    ExplicitWidth = 100
   end
 end

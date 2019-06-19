@@ -64,13 +64,13 @@ type
     class procedure SetAsMainForm;
     property Session: TewSession read GetSession write SetSession;
   published
+
     property Caption;
     property Color;
     property ExtraMeta: TStrings read FExtraMeta write SetExtraMeta;
     property ExtraScript: TStrings read FExtraScript write SetExtraScript;
     property JavascriptIncludes: TStrings read FJavascriptIncludes write SetJavascriptIncludes;
     property PixelsPerInch;
-
     { Public declarations }
   end;
 
@@ -93,7 +93,7 @@ type
 
 constructor TEWForm.CreateNew(AOwner: TComponent; Dummy: Integer  = 0);
 begin
-  inherited;
+  inherited CreateNew(AOwner, Dummy);
   FDialogs := TEWDialog.Create(Self);
   FDialogs.Name := Name+C_DIALOG;
   FExtraMeta := TStringList.Create;

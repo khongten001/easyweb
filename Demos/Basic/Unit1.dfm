@@ -670,6 +670,7 @@ object Form1: TForm1
     OnMouseEnter = EWComboBox1MouseEnter
     OnMouseLeave = EWComboBox1MouseLeave
     Text = ''
+    Items = <>
     ItemIndex = 0
   end
 end

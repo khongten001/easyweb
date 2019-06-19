@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EWForm, EWEdits, EWBase, EWButtons,
-  EWLabel, EWProgressBars, Vcl.Imaging.jpeg, EWImages, EWCheckbox;
+  EWLabel, EWProgressBars, Vcl.Imaging.jpeg, EWImages, EWCheckbox, SessionDataUnit;
 type
   TForm1 = class(TEwForm)
     EWLabel2: TEWLabel;
@@ -40,8 +40,10 @@ type
     procedure EWComboBox1MouseEnter(Sender: TObject);
     procedure EWComboBox1MouseLeave(Sender: TObject);
   private
+    function GetSessionData: TEWSessionData;
     { Private declarations }
   public
+    property SessionData: TEWSessionData read GetSessionData;
     { Public declarations }
   end;
 
@@ -53,9 +55,12 @@ uses EWTypes, Unit2;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
-
 {$R *.dfm}
 
+function TForm1.GetSessionData: TEWSessionData;
+begin
+  Result := (Session.DataModule as TEWSessionData);
+end;
 
 procedure TForm1.EWButton1Click(Sender: TObject);
 begin

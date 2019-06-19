@@ -69,9 +69,17 @@ type
     constructor Create(AMainForm: Boolean);
   end;
 
-  { TEWDataModuleCreator }
+  { TEWServerControllerCreator }
 
-  TEWDataModuleCreator = class(TEWBaseFormCreator)
+  TEWServerControllerCreator = class(TEWBaseFormCreator)
+  public
+    constructor Create;
+    function GetImplFileName: string; override;
+  end;
+
+  { TEWSessionDataCreator }
+
+  TEWSessionDataCreator = class(TEWBaseFormCreator)
   public
     constructor Create;
     function GetImplFileName: string; override;
@@ -139,7 +147,8 @@ begin
   begin
     AApp := TEWProjectnCreator.Create();
     AModuleServices.CreateModule(AApp);
-    AModuleServices.CreateModule(TEWDataModuleCreator.Create());
+    AModuleServices.CreateModule(TEWServerControllerCreator.Create());
+    AModuleServices.CreateModule(TEWSessionDataCreator.Create());
     AModuleServices.CreateModule(TEWFormCreator.Create(True));
   end;
 end;
@@ -191,31 +200,37 @@ begin
   'interface'+#13#10+#13#10+
   'uses'+#13#10+
   '  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,'+#13#10+
-  '  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EWForm;'+#13#10+
+  '  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EWForm, SessionDataUnit;'+#13#10+
 
   'type'+#13#10+
-  '  T%FormIdent% = class(TEwForm)'+#13#10+
+  '  T%FormIdent% = class(TEWForm)'+#13#10+
   '  private'+#13#10+
+  '    function GetSessionData: TEWSessionData;'+CR+
   '    { Private declarations }'+#13#10+
   '  public'+#13#10+
+  '    property SessionData: TEWSessionData read GetSessionData;'+CR+
   '    { Public declarations }'+#13#10+
   '  end;'+#13#10+#13#10+
-  ''+#13#10+#13#10+
   'implementation'+#13#10+
-#13#10+#13#10+
+#13#10+
 '{%CLASSGROUP ''Vcl.Controls.TControl''}'+#13#10+
-#13#10+#13#10+
+#13#10+
   '{$R *.dfm}'+#13#10+
-  ''+#13#10+#13#10+
+  ''+#13#10+
+
+'function T%FormIdent%.GetSessionData: TEWSessionData;'+CR+
+'begin'+CR+
+'  Result := (Session.DataModule as TEWSessionData);'+CR+
+'end;'+CR+CR+
 
   AInitialization+
   'end. ';
   inherited Create(AFormTemplate, AImplTemplate);
 end;
 
-{ TEWDataModuleCreator }
+{ TEWServerControllerCreator }
 
-constructor TEWDataModuleCreator.Create;
+constructor TEWServerControllerCreator.Create;
 var
   AFormTemplate, AImplTemplate: string;
 begin
@@ -243,8 +258,6 @@ begin
 '  public  '+#13#10+
 '    { Public declarations } '+#13#10+
 '  end;'+#13#10+
-#13#10+#13#10+
-#13#10+
 #13#10+
 
 
@@ -252,7 +265,7 @@ begin
 CR+
 '{%CLASSGROUP ''Vcl.Controls.TControl''}'+CR+CR+
 '{$R *.dfm}'+#13#10+
-#13#10+#13#10+
+#13#10+
 'initialization'+#13#10+#13#10+
 'TEWServerController.Initialize;'+#13#10+#13#10+
 'end.';
@@ -261,7 +274,7 @@ CR+
 
 end;
 
-function TEWDataModuleCreator.GetImplFileName: string;
+function TEWServerControllerCreator.GetImplFileName: string;
 begin
   Result := IncludeTrailingPathDelimiter(TPath.GetDocumentsPath)+'Embarcadero\Studio\Projects\ServerController.pas';
 
@@ -297,6 +310,57 @@ end;
 function TEWFormWizard.GetName: string;
 begin
   Result := C_EW_FORM_WIZARD_NAME;
+end;
+
+{ TEWSessionDataCreator }
+
+constructor TEWSessionDataCreator.Create;
+var
+  AFormTemplate, AImplTemplate: string;
+begin
+
+  AFormTemplate := 'object EWSessionData: TEWSessionData '+#13+
+  '  OldCreateOrder = False '+#13#10+
+  '  Height = 150 '+#13#10+
+  '  Width = 215 '+#13#10+
+  'end';
+
+  AImplTemplate := 'unit SessionDataUnit;'+#13+
+
+'interface'+#13#10+
+#13#10+
+'uses  '+#13#10+
+'  System.SysUtils, System.Classes;'+CR+CR+
+
+
+'type  '+#13#10+
+'  TEWSessionData = class(TDataModule) '+#13#10+
+'  private  '+#13#10+
+'    { Private declarations }'+#13#10+
+'  public  '+#13#10+
+'    { Public declarations } '+#13#10+
+'  end;'+#13#10+
+#13#10+
+
+
+'implementation'+
+CR+CR+
+'uses EWSession;' +CR+CR+
+
+'{%CLASSGROUP ''Vcl.Controls.TControl''}'+CR+CR+
+'{$R *.dfm}'+#13#10+
+#13#10+
+'initialization'+CR+CR+
+'TEWSession.RegisterSessionData(TEWSessionData);' +CR+CR+
+'end.';
+
+  inherited Create(AFormTemplate, AImplTemplate);
+
+end;
+
+function TEWSessionDataCreator.GetImplFileName: string;
+begin
+  Result := IncludeTrailingPathDelimiter(TPath.GetDocumentsPath)+'Embarcadero\Studio\Projects\SessionDataUnit.pas';
 end;
 
 end.

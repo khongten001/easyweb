@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EWForm, EWBase, EWButtons, EWNavBar,
   EWLabel, Vcl.Imaging.jpeg, EWTypes, EWLayout, EWProgressBars, EWImages,
-  EWEdits;
+  EWEdits, SessionDataUnit;
+
 type
   TForm57 = class(TEwForm)
     EWNavBar1: TEWNavBar;
@@ -32,8 +33,11 @@ type
     procedure EWComboBox1MouseLeave(Sender: TObject);
     procedure EWComboBox1MouseEnter(Sender: TObject);
   private
+    function GetSessionData: TEWSessionData;
+
     { Private declarations }
   public
+    property SessionData: TEWSessionData read GetSessionData;
     { Public declarations }
   end;
 
@@ -44,11 +48,14 @@ implementation
 
 {$R *.dfm}
 
+function TForm57.GetSessionData: TEWSessionData;
+begin
+  Result := (Session.DataModule as TEWSessionData);
+end;
 
 procedure TForm57.EWButton1Click(Sender: TObject);
 begin
   EWLabel1.Font.Variant := fvSmallCaps;
-
 end;
 
 procedure TForm57.EWButton2Click(Sender: TObject);
