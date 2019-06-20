@@ -132,7 +132,7 @@ const
 
   C_HTML_DIALOG                   = '<div id="%id%"></div>';
   C_HTML_EDIT                     = '<input id="%id" %style% type="%type%" class="form-control" placeholder="%placeholder%" value="%text%" ">';
-  C_HTML_IMAGE                    = '<img  id="id" %style% style="width:100%;height:auto;"  rel="prefetch" class= "%clsss" src="%src%">';
+  C_HTML_IMAGE                    = '<img  id="%id%" %style% style="width:100%;height:auto;"  rel="prefetch" class= "%clsss" src="%src%">';
   C_HTML_LABEL                    = '<div id="%id%" %style%>%text%</div>';
   C_HTML_TABLE                    = '<div id="%id%" %style%><table class="table %striped% %theme% %hover%" style="width:100%"><thead>%header%</thead><tbody>%content%</tbody></table></div>';
   C_HTML_TEXT_AREA                = '<textarea id="%id" %style% class="form-control" cols="80" rows="5">%text%</textarea>';

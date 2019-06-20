@@ -43,7 +43,7 @@ type
     function GetCoreJs: string;
 
     procedure ExecuteGetCmd(AContext: TIdContext;
-  ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+      ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
 
     procedure SetPort(const Value: integer);
     procedure ServeImage(ASessionID, AImage: string; AResponseInfo: TIdHTTPResponseInfo);
@@ -172,7 +172,6 @@ var
   AName: string;
   AValue: string;
   AHtml: string;
-  ICount: integer;
   AChanges: TJsonArray;
   AObj: TJsonObject;
   AParams: TStrings;
@@ -181,150 +180,137 @@ var
   AJSon: TJSonObject;
   AEventParams: TStrings;
 begin
-  try
-    if Pos(C_FAVICON, ARequestInfo.URI) > 0 then
-      exit;
+  ASession := nil;
+  if Pos(C_FAVICON, ARequestInfo.URI) > 0 then
+    Exit;
 
-    AResponseInfo.ContentText := '';
+  AResponseInfo.ContentText := '';
 
-    if ARequestInfo.URI = '/ewcore.js' then AResponseInfo.ContentText := GetCoreJs;
+  if ARequestInfo.URI = '/ewcore.js' then AResponseInfo.ContentText := GetCoreJs;
 
-    if AResponseInfo.ContentText <> '' then
+  if AResponseInfo.ContentText <> '' then
+  begin
+    AResponseInfo.ContentType := C_TEXT_JAVASCRIPT;;
+    Exit;
+  end;
+
+
+  AParams := ARequestInfo.Params;
+  s := AParams.Values[C_SESSION];
+
+  if Pos('/images', ARequestInfo.URI) = 1 then
+  begin
+    ServeImage(AParams.Values['s'], AParams.Values['img'], AResponseInfo);
+    Exit;
+  end;
+
+  if s <> '' then
+  begin
+    ASession := Sessions.SessionByID[s];
+    if ASession = nil then
+      ASession := Sessions.AddSession(s)
+  end;
+
+  AAction := ARequestInfo.Params.Values[C_ACTION];
+  AData := ARequestInfo.Params.Values[C_DATA];
+  if ASession = nil then s := '';
+
+  if s = '' then
+  begin
+    s := GUIDToString(TGUID.NewGuid).ToLower;
+    s := StringReplace(s, '{', '', [rfReplaceAll]);
+    s := StringReplace(s, '-', '', [rfReplaceAll]);
+    s := StringReplace(s, '}', '', [rfReplaceAll]);
+    Sessions.AddSession(s);
+    AResponseInfo.Redirect(ARequestInfo.Command+'?'+C_SESSION+'='+s);
+    Exit;
+  end;
+
+  if (ASession <> nil) and (ASession.SelectedForm <> nil) then
+  begin
+    AName := ARequestInfo.Params.Values[C_NAME];
+    AName := GetStrBefore('-', AName);
+    AValue := ARequestInfo.Params.Values[C_VALUE];
+    if AData <> '' then
     begin
-      AResponseInfo.ContentType := C_TEXT_JAVASCRIPT;;
-      Exit;
+      AJson := TJSONObject.ParseJSONValue(AData) as TJSONObject;
+      AName := AJson.GetValue(C_NAME).Value;
+      if AValue <> '' then AJSon.AddPair(C_VALUE, AValue);
     end;
+  end;
 
-    ASession := nil;
-
-    AParams := ARequestInfo.Params;
-    s := AParams.Values[C_SESSION];
-
-    if Pos('/images', ARequestInfo.URI) = 1 then
+  TThread.Synchronize(nil,
+    procedure
+    var
+      i: integer;
+      ICount: integer;
     begin
-      ServeImage(AParams.Values['s'], AParams.Values['img'], AResponseInfo);
-      Exit;
-    end;
-
-    if s <> '' then
-    begin
-      ASession := Sessions.SessionByID[s];
-      if ASession = nil then
-        ASession := Sessions.AddSession(s)
-    end;
-
-    aaction := ARequestInfo.Params.Values[C_ACTION];
-    AData := ARequestInfo.Params.Values[C_DATA];
-    if ASession = nil then s := '';
-
-    if (ASession <> nil) and (ASession.SelectedForm <> nil) then
-    begin
-      AName := ARequestInfo.Params.Values[C_NAME];
-      AName := GetStrBefore('-', AName);
-      AValue := ARequestInfo.Params.Values[C_VALUE];
-
-      if AData <> '' then
-      begin
-        AJson := TJSONObject.ParseJSONValue(AData) as TJSONObject;
-        AName := AJson.GetValue(C_NAME).Value;
-        if AValue <> '' then AJSon.AddPair(C_VALUE, AValue);
-
-      end;
-
-      c := TForm(ASession.SelectedForm).FindComponent(AName);
-      if c <> nil then
-      begin
-        TThread.Synchronize(nil,
-          procedure
-          var
-            i: integer;
-          begin
-            AEventParams := TStringList.Create;
-            try
-              if AJson <> nil then
-              begin
-                for i := 0 to AJSon.Count-1 do
-                  AEventParams.Values[AJSon.Pairs[i].JsonString.Value] := AJSon.Pairs[i].JsonValue.Value;
-              end;
-              if AValue <> '' then
-                AEventParams.Values[C_VALUE] := AValue;
-              if Supports(c, IEWBaseComponent, AIntf) then AIntf.DoEvent(AEventParams);
-            finally
-              AEventParams.Free;
-            end;
-        end);
-      end;
-    end;
-
-    if s = '' then
-    begin
-      s := GUIDToString(TGUID.NewGuid).ToLower;
-      s := StringReplace(s, '{', '', [rfReplaceAll]);
-      s := StringReplace(s, '-', '', [rfReplaceAll]);
-      s := StringReplace(s, '}', '', [rfReplaceAll]);
-      TThread.Synchronize(nil,
-      procedure
-      begin
-        Sessions.AddSession(s);
-      end
-    );
-
-
-      AResponseInfo.Redirect(ARequestInfo.Command+'?'+C_SESSION+'='+s);
-      //ASession.RequiresReload := True;
-      Exit;
-    end;
-
-    if ASession.RequiresReload then
-    begin
-      AResponseInfo.ContentText := C_RELOAD;
-      ASession.RequiresReload := False;
-      Exit;
-
-    end;
-
-    if (ARequestInfo.Params.Values[C_ASYNC] = 'T') then
-    begin
-      AChanges := TJsonArray.Create;
       try
-        for ICount := 0 to TForm(ASession.SelectedForm).ComponentCount-1 do
+        c := TForm(ASession.SelectedForm).FindComponent(AName);
+        if c <> nil then
         begin
-          c := TForm(ASession.SelectedForm).Components[ICount];
-          if Supports(c, IEWBaseComponent, AIntf) then
-          begin
-
-            if AIntf.HasChanged then
+          AEventParams := TStringList.Create;
+          try
+            if AJson <> nil then
             begin
-              AObj := TJsonObject.Create;
-              AObj.AddPair(C_NAME, AIntf.Name);
-              AObj.AddPair(C_SCRIPT, AIntf.Script);
-              AObj.AddPair(C_HTML, AIntf.Html);
-              AChanges.Add(AObj);
+              for i := 0 to AJSon.Count-1 do
+                AEventParams.Values[AJSon.Pairs[i].JsonString.Value] := AJSon.Pairs[i].JsonValue.Value;
             end;
-
+            if AValue <> '' then
+              AEventParams.Values[C_VALUE] := AValue;
+            if Supports(c, IEWBaseComponent, AIntf) then AIntf.DoEvent(AEventParams);
+          finally
+            AEventParams.Free;
           end;
         end;
-        AResponseInfo.ContentText := AChanges.ToJSON;
-        AResponseInfo.ResponseNo := 200;
-        AResponseInfo.ContentType := C_APPLICATION_JSON;
+        if ASession.RequiresReload then
+        begin
+          AResponseInfo.ContentText := C_RELOAD;
+          ASession.RequiresReload := False;
+          Exit;
+        end;
+
+        if (ARequestInfo.Params.Values[C_ASYNC] = 'T') then
+        begin
+          AChanges := TJsonArray.Create;
+          try
+            for ICount := 0 to TForm(ASession.SelectedForm).ComponentCount-1 do
+            begin
+              c := TForm(ASession.SelectedForm).Components[ICount];
+              if Supports(c, IEWBaseComponent, AIntf) then
+              begin
+                if AIntf.HasChanged then
+                begin
+                  AObj := TJsonObject.Create;
+                  AObj.AddPair(C_NAME, AIntf.Name);
+                  AObj.AddPair(C_SCRIPT, AIntf.Script);
+                  AObj.AddPair(C_HTML, AIntf.Html);
+                  AChanges.Add(AObj);
+                end;
+              end;
+            end;
+            AResponseInfo.ContentText := AChanges.ToJSON;
+            AResponseInfo.ResponseNo := 200;
+            AResponseInfo.ContentType := C_APPLICATION_JSON;
+          finally
+            AChanges.Free;
+          end;
+        end
+        else
+        begin
+          AHtml := Sessions.SessionByID[s].Html;
+          AResponseInfo.ContentText := AHtml;
+          AResponseInfo.ContentType := C_TEXT_HTML;
+        end;
       finally
-        AChanges.Free;
-      end;
+        if Assigned(AResponseInfo.ContentStream) then
+        ABytes := AResponseInfo.ContentStream.Size
+      else
+        ABytes := AResponseInfo.ContentText.Length;
+      FBytesSent := FBytesSent + ABytes;
+      FreeAndNil(AJson);
     end
-    else
-    begin
-      AHtml := Sessions.SessionByID[s].Html;
-      AResponseInfo.ContentText := AHtml;
-      AResponseInfo.ContentType := C_TEXT_HTML;
-    end;
-  finally
-    if Assigned(AResponseInfo.ContentStream) then
-      ABytes := AResponseInfo.ContentStream.Size
-    else
-      ABytes := AResponseInfo.ContentText.Length;
-    FBytesSent := FBytesSent + ABytes;
-    FreeAndNil(AJson);
-  end;
+  end);
 end;
 
 function TEWBaseServerController.GetCoreJs: string;

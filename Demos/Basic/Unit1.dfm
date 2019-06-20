@@ -7,17 +7,6 @@ object Form1: TForm1
   Color = clBtnFace
   PixelsPerInch = 96
   TextHeight = 13
-  object EWLabel2: TEWLabel
-    Left = 24
-    Top = 25
-    Width = 217
-    Height = 41
-    Font.Variant = fvNormal
-    Font.Size = 20
-    Font.Style = []
-    Font.Color = clBlack
-    Text = 'Progress Bar'
-  end
   object EWDropDown1: TEWDropDown
     Left = 24
     Top = 80
@@ -25,7 +14,16 @@ object Form1: TForm1
     Height = 41
     ButtonType = btPrimary
     Text = 'EWDropDown1'
-    Items = <>
+    Items = <
+      item
+        Text = 'Item 1'
+      end
+      item
+        Text = 'Item 2'
+      end
+      item
+        Text = 'Item 3'
+      end>
     OnItemClick = EWDropDown1ItemClick
   end
   object EWButton1: TEWButton
@@ -624,7 +622,20 @@ object Form1: TForm1
     Height = 41
     ButtonType = btPrimary
     Text = 'EWDropDown1'
-    Items = <>
+    Items = <
+      item
+        Text = 'Danger'
+      end
+      item
+        Text = 'Success'
+      end
+      item
+        Text = 'Dropdown'
+      end
+      item
+        Text = 'Primary'
+      end>
+    OnItemClick = EWDropDown2ItemClick
   end
   object EWCheckBox1: TEWCheckBox
     Left = 280
@@ -654,23 +665,5 @@ object Form1: TForm1
     OnClick = EWButton3Click
     ButtonType = btInfo
     Text = 'Open Second Form'
-  end
-  object EWEdit1: TEWEdit
-    Left = 280
-    Top = 25
-    Width = 100
-    Height = 41
-    Text = ''
-  end
-  object EWComboBox1: TEWComboBox
-    Left = 320
-    Top = 472
-    Width = 100
-    Height = 41
-    OnMouseEnter = EWComboBox1MouseEnter
-    OnMouseLeave = EWComboBox1MouseLeave
-    Text = ''
-    Items = <>
-    ItemIndex = 0
   end
 end

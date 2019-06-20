@@ -67,7 +67,7 @@ type
 
 implementation
 
-uses EWServerControllerBase, SysUtils, System.Threading, EWIntf, EWForm, EWTypes;
+uses EWServerControllerBase, SysUtils, EWIntf, EWForm, EWTypes;
 
 var
   SessionDataClass: TEWSessionDataClass;
@@ -104,14 +104,13 @@ begin
   inherited Create;
   FForms := TObjectList<TCustomForm>.Create(True);
   FDatamodule := SessionDataClass.Create(nil);
-  TThread.Synchronize(nil,
-  procedure
-  begin
-    AForm := EWMainFormClass.CreateNew(nil);
-    InitInheritedComponent(AForm, TEWForm);
-    TEWForm(AForm).Session := Self;
-    FForms.Add(TCustomForm(AForm));
-  end);
+
+
+  AForm := EWMainFormClass.CreateNew(nil);
+  InitInheritedComponent(AForm, TEWForm);
+  TEWForm(AForm).Session := Self;
+  FForms.Add(TCustomForm(AForm));
+
   FSessionID := ASessionID;
 
   FFormIndex := 0;
@@ -127,13 +126,10 @@ end;
 
 procedure TEWSession.PopForm;
 begin
-  TThread.Synchronize(nil,
-  procedure
-  begin
-    FForms.Delete(FFormIndex);
-    Dec(FFormIndex);
-    FRequiresReload := True;
-  end);
+
+  FForms.Delete(FFormIndex);
+  Dec(FFormIndex);
+  FRequiresReload := True;
 end;
 
 procedure TewSession.PushForm(AForm: TCustomForm);

@@ -8,7 +8,6 @@ uses
   EWLabel, EWProgressBars, Vcl.Imaging.jpeg, EWImages, EWCheckbox, SessionDataUnit;
 type
   TForm1 = class(TEwForm)
-    EWLabel2: TEWLabel;
     EWDropDown1: TEWDropDown;
     EWButton1: TEWButton;
     EWProgressBar1: TEWProgressBar;
@@ -22,8 +21,6 @@ type
     EWCheckBox1: TEWCheckBox;
     EWLabel6: TEWLabel;
     EWButton3: TEWButton;
-    EWEdit1: TEWEdit;
-    EWComboBox1: TEWComboBox;
     procedure EWImage1MouseEnter(Sender: TObject);
     procedure EWImage1MouseLeave(Sender: TObject);
     procedure EWImage1Click(Sender: TObject);
@@ -32,13 +29,12 @@ type
     procedure EWButton2Click(Sender: TObject);
     procedure EWButton1Click(Sender: TObject);
     procedure EWCheckBox1Click(Sender: TObject);
-    procedure EWDropDown2ItemClick(Sender: TObject; AItem: string;
-      AIndex: Integer);
+   
     procedure EWButton3Click(Sender: TObject);
     procedure EWDropDown1ItemClick(Sender: TObject; AItem: TCollectionItem;
       ADropDownIndex: Integer);
-    procedure EWComboBox1MouseEnter(Sender: TObject);
-    procedure EWComboBox1MouseLeave(Sender: TObject);
+    procedure EWDropDown2ItemClick(Sender: TObject; AItem: TCollectionItem;
+      ADropDownIndex: Integer);
   private
     function GetSessionData: TEWSessionData;
     { Private declarations }
@@ -83,28 +79,17 @@ begin
   EWProgressBar1.Animated := EWCheckBox1.Checked;
 end;
 
-procedure TForm1.EWComboBox1MouseEnter(Sender: TObject);
-begin
-  EWLabel5.Text := 'Mouse Enter';
-
-end;
-
-procedure TForm1.EWComboBox1MouseLeave(Sender: TObject);
-begin
-  EWLabel5.Text := 'Mouse Leave';
-
-end;
-
 procedure TForm1.EWDropDown1ItemClick(Sender: TObject; AItem: TCollectionItem;
   ADropDownIndex: Integer);
 begin
   EWLabel3.Text := 'You clicked '+TEWDropDownItem(AItem).Text;
 end;
 
-procedure TForm1.EWDropDown2ItemClick(Sender: TObject; AItem: string;
-  AIndex: Integer);
+
+procedure TForm1.EWDropDown2ItemClick(Sender: TObject; AItem: TCollectionItem;
+  ADropDownIndex: Integer);
 begin
-  case AIndex of
+ case ADropDownIndex of
     0: EWProgressBar1.Style := TEWButtonType.btDanger;
     1: EWProgressBar1.Style := TEWButtonType.btSuccess;
     2: EWProgressBar1.Style := TEWButtonType.btWarning;
