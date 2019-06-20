@@ -211,33 +211,10 @@ begin
       ASession := Sessions.AddSession(s)
   end;
 
+
   AAction := ARequestInfo.Params.Values[C_ACTION];
   AData := ARequestInfo.Params.Values[C_DATA];
   if ASession = nil then s := '';
-
-  if s = '' then
-  begin
-    s := GUIDToString(TGUID.NewGuid).ToLower;
-    s := StringReplace(s, '{', '', [rfReplaceAll]);
-    s := StringReplace(s, '-', '', [rfReplaceAll]);
-    s := StringReplace(s, '}', '', [rfReplaceAll]);
-    Sessions.AddSession(s);
-    AResponseInfo.Redirect(ARequestInfo.Command+'?'+C_SESSION+'='+s);
-    Exit;
-  end;
-
-  if (ASession <> nil) and (ASession.SelectedForm <> nil) then
-  begin
-    AName := ARequestInfo.Params.Values[C_NAME];
-    AName := GetStrBefore('-', AName);
-    AValue := ARequestInfo.Params.Values[C_VALUE];
-    if AData <> '' then
-    begin
-      AJson := TJSONObject.ParseJSONValue(AData) as TJSONObject;
-      AName := AJson.GetValue(C_NAME).Value;
-      if AValue <> '' then AJSon.AddPair(C_VALUE, AValue);
-    end;
-  end;
 
   TThread.Synchronize(nil,
     procedure
@@ -245,6 +222,30 @@ begin
       i: integer;
       ICount: integer;
     begin
+      if s = '' then
+      begin
+        s := GUIDToString(TGUID.NewGuid).ToLower;
+        s := StringReplace(s, '{', '', [rfReplaceAll]);
+        s := StringReplace(s, '-', '', [rfReplaceAll]);
+        s := StringReplace(s, '}', '', [rfReplaceAll]);
+        Sessions.AddSession(s);
+        AResponseInfo.Redirect(ARequestInfo.Command+'?'+C_SESSION+'='+s);
+        Exit;
+      end;
+
+      if (ASession <> nil) and (ASession.SelectedForm <> nil) then
+      begin
+        AName := ARequestInfo.Params.Values[C_NAME];
+        AName := GetStrBefore('-', AName);
+        AValue := ARequestInfo.Params.Values[C_VALUE];
+        if AData <> '' then
+        begin
+          AJson := TJSONObject.ParseJSONValue(AData) as TJSONObject;
+          AName := AJson.GetValue(C_NAME).Value;
+          if AValue <> '' then AJSon.AddPair(C_VALUE, AValue);
+        end;
+      end;
+
       try
         c := TForm(ASession.SelectedForm).FindComponent(AName);
         if c <> nil then
