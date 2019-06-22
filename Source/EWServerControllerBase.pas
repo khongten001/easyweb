@@ -315,8 +315,9 @@ begin
 end;
 
 function TEWBaseServerController.GetCoreJs: string;
-begin
- Result := 'function getQueryStringValue (key) '+CR+
+const
+
+ EWCore_JS_v1 = 'function getQueryStringValue (key) '+CR+
               '{'+CR+
               '  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));'+CR+
               '}'+CR+CR+
@@ -373,6 +374,69 @@ begin
               '  });'+CR+
 
               '};';
+
+ EWCore_JS_Async ='const basePort = "%d";' + CR +
+               'const baseURL = "http://localhost:" + basePort;' + CR+
+               '' + CR+
+               'function getQueryStringValue (key)' + CR+
+               '{' + CR+
+               'return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));' + CR+
+               '}' + CR+
+               '' + CR+
+               'function evaluateArray(element, i) {' + CR+
+               '  console.log(element);'+CR+
+               '  const el = $(`#${element.name}`)[0];' + CR+
+               '  if (el) {' + CR+
+               '    console.log(el);'+CR+
+               '    console.log(el.outerHTML);'+CR+
+               '    el.outerHTML = element.html;' + CR+
+               '    console.log(el.outerHTML);'+CR+
+               '    if (element.script != "") {' + CR+
+               '      eval(element.script);' + CR+
+               '    }' + CR+
+               '  } else {' + CR+
+               '    console.log(`Element #${i} not found or no html property`);' + CR+
+               '  }' + CR+
+               '}' + CR+
+               '' + CR+
+               'function evaluateResponse(response, textStatus, responseObject) {' + CR+
+               '// console.log(response);' + CR+
+               '// console.log(textStatus);' + CR+
+               '// console.dir(responseObject);' + CR+
+               'if (responseObject.readyState == 4 && responseObject.status == 200) {' + CR+
+               'if (response=="reload")' + CR+
+               '{' + CR+
+               'location.reload();' + CR+
+               '} else if (responseObject.responseJSON) {' + CR+
+               '' + CR+
+               'const obj = responseObject.responseJSON;' + CR+
+               'const ajson = obj;' + CR+
+               'ajson.forEach(evaluateArray);' + CR+
+               '}' + CR+
+               '}' + CR+
+               '}' + CR+
+               '' + CR+
+               'function asyncEvent(aaction, aname, avalue)' + CR+
+               '{' + CR+
+               'var url = baseURL + "/?async=T&session="+getQueryStringValue("session")+"&action="+aaction+"&name="+aname+"&value="+avalue;' + CR+
+               '$.get(url, evaluateResponse);' + CR+
+               '};' + CR+
+               '' + CR+
+               'function eventCall(aaction, avalue, adata)' + CR+
+               '{' + CR+
+               'const url = baseURL + "/?async=T&session="+getQueryStringValue("session")+"&action="+aaction+"&data="+adata+"&value="+avalue;' + CR+
+               '$.get(url, evaluateResponse);' + CR+
+               '};' + CR+
+               '' + CR+
+               'function asyncKeypress(aname, avalue)' + CR+
+               '{' + CR+
+               'var url = baseURL + "/?async=T&session="+getQueryStringValue("session")+"&action=keypress&name="+aname+"&value=" + avalue;' + CR+
+               '$.get(url, evaluateResponse);' + CR+
+               '};';
+
+
+begin
+  result := format(EWCore_JS_Async, [FPort]);
 end;
 
 class procedure TEWBaseServerController.Initialize;
