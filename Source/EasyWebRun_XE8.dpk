@@ -35,8 +35,6 @@ requires
   IndyProtocols,
   IndyCore,
   vclimg,
-  JvCore,
-  JvCmp,
   vclie;
 
 contains
@@ -60,7 +58,8 @@ contains
   EWButtons in 'EWButtons.pas',
   EWBadge in 'EWBadge.pas',
   EWCheckGroup in 'EWCheckGroup.pas',
-  EWTable in 'EWTable.pas';
+  EWTable in 'EWTable.pas',
+  EWHtmlForm in 'EWHtmlForm.pas';
 
 end.
 

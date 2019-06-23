@@ -52,7 +52,8 @@ uses
   EWNavBar,
   EWDialogs,
   EWCheckGroup,
-  EWTable;
+  EWTable,
+  EWHtmlForm;
 
 
 type
@@ -89,8 +90,9 @@ begin
   RegisterComponents('EasyWeb', [TEWCheckBoxGroup]);
   RegisterComponents('EasyWeb', [TEWRadioGroup]);
   RegisterComponents('EasyWeb', [TEWTable]);
-  RegisterPropertyEditor(TypeInfo(string), TEWFont, 'Family', TEWFontFamilyList);
+  RegisterComponents('EasyWeb', [TEWHTMLForm]);
 
+  RegisterPropertyEditor(TypeInfo(string), TEWFont, 'Family', TEWFontFamilyList);
 end;
 
 { TEWFontFamilyList }

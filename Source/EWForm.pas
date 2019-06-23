@@ -41,6 +41,7 @@ type
     FExtraScript: TStrings;
     FSession: TewSession;
     FDialogs: TEWDialog;
+
     function GetHtml: string;
     function GetBootstrapFiles: string;
     function GetBootstrapCSS: string;
@@ -60,6 +61,7 @@ type
     procedure ValidateInsert(AComponent: TComponent); override;
     procedure ShowMessage(AText: string);
   public
+    constructor Create(AOwner: TComponent); override;
     constructor CreateNew(AOwner: TComponent; Dummy: Integer  = 0); override;
     destructor Destroy; override;
     class procedure SetAsMainForm;
@@ -92,6 +94,14 @@ type
 
 {$R *.dfm}
 
+constructor TEWForm.Create(AOwner: TComponent);
+begin
+  inherited;
+  FExtraMeta := TStringList.Create;
+  FExtraScript := TStringList.Create;
+  FJavascriptIncludes := TStringList.Create;
+end;
+
 constructor TEWForm.CreateNew(AOwner: TComponent; Dummy: Integer  = 0);
 begin
   inherited CreateNew(AOwner, Dummy);
@@ -117,8 +127,6 @@ begin
 end;
 
 function TEWForm.GetBootStrapCSS: string;
-var
-  AStrings: TStrings;
 begin
   case GlobalServerController.BootstrapVersion of
     Bootstrap_v4_0: result := '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">';
@@ -246,7 +254,7 @@ begin
 
               GetBootstrapFiles +
               '<script type="text/javascript" src="/ewcore.js"></script>'+CR+
-              '<script>'+CR+
+              '<script type="text/javascript">'+CR+
                 Trim(AListners.Text)) + CR + CR +
                 ' // Extra Script: ' + CR +
                 FExtraScript.Text+CR+

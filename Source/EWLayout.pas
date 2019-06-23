@@ -120,7 +120,7 @@ begin
   AFluid := '';
   if FFluid then
     AFluid := '-fluid';
-  Result := '<div id="'+Name+'" style="border:solid red 1px; position:relative; height:'+Height.ToString+'px;'+FPadding.AsCssProperty+'" class="container'+AFluid+'" id="'+Name+'">';
+  Result := '<div id="'+Name+'" style="position:relative; height:'+Height.ToString+'px;'+FPadding.AsCssProperty+'" class="container'+AFluid+'">';
     for ICount := 0 to ControlCount-1 do
     Result := Result + TewBaseObject(Controls[ICount]).Html;
   Result := Result + '</div>';
@@ -159,7 +159,7 @@ var
   ICount: integer;
 begin
   inherited;
-  Result := '<div id="'+Name+'" style="top:'+Top.ToString+'px; min-height:20px;" class="container" id="'+Name+'">';
+  Result := '<div id="'+Name+'" style="top:'+Top.ToString+'px; min-height:20px;" class="container">';
   Result := Result + '<div style="height:100%; " class="row">';
     for ICount := 0 to ControlCount-1 do
   begin

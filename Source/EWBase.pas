@@ -49,6 +49,7 @@ type
 
   TewBaseObject = class(TCustomControl, IEWBaseComponent, IEWBaseVisualObject)
   private
+    FExtraHtmlTags: TStrings;
     FChanged: Boolean;
     FOnMouseEnter: TNotifyEvent;
     FOnMouseLeave: TNotifyEvent;
@@ -60,7 +61,8 @@ type
     FOnRightClick: TNotifyEvent;
     function GetHasChanged: Boolean;
     function GetName: string;
-
+    function GetExtraTags: string;
+    procedure SetExtraHtmlTags(const Value: TStrings);
   protected
     function GetID: string;
     function GetScript: string; virtual;
@@ -106,6 +108,7 @@ type
     property Html: string read GetHtml;
     property HasChanged: Boolean read GetHasChanged write FChanged;
   published
+    property ExtraHtmlTags: TStrings read FExtraHtmlTags write SetExtraHtmlTags;
     property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
     property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
     property OnClick: TNotifyEvent read FOnClick write FOnClick;
@@ -337,6 +340,7 @@ end;
 constructor TewBaseObject.Create(AOwner: TComponent);
 begin
   inherited;
+  FExtraHtmlTags := TStringList.Create;
   FCssProperties := TStringList.Create;
   FMouseOver := False;
 
@@ -350,6 +354,7 @@ end;
 destructor TewBaseObject.Destroy;
 begin
   FCssProperties.Free;
+  FExtraHtmlTags.Free;
   inherited;
 end;
 
@@ -433,6 +438,16 @@ begin
   if Assigned(FOnRightClick) then AddRightClickEvent(AListners);
 end;
 
+function TewBaseObject.GetExtraTags: string;
+var
+  ICount: integer;
+begin
+  Result := '';
+  for ICount := 0 to FExtraHtmlTags.Count-1 do
+    Result := Result + FExtraHtmlTags[ICount]+' ';
+  Result := Trim(Result);
+end;
+
 procedure TewBaseObject.GetGlobalVars(AStrings: TStrings);
 begin
   //
@@ -487,6 +502,7 @@ begin
   Result := StringReplace(Result, '%name%', Name, [rfReplaceAll]); // name may be used as part of sub-element names
   Result := StringReplace(Result, '%id%', GetID, []);
   Result := StringReplace(Result, '%style%', GetCss, []);
+  Result := StringReplace(Result, '%extratags%', GetExtraTags, []);
 
 end;
 
@@ -524,6 +540,15 @@ begin
   Changed;
 end;
 
+procedure TewBaseObject.SetExtraHtmlTags(const Value: TStrings);
+begin
+  if Value.Text <> FExtraHtmlTags.Text then
+  begin
+    FExtraHtmlTags.Assign(Value);
+    Changed;
+  end;
+end;
+
 procedure TewBaseObject.SetName(const Value: TComponentName);
 begin
   inherited;
@@ -534,11 +559,5 @@ begin
   inherited;
   FChanged := True;
 end;
-
-
-
-
-
-
 
 end.

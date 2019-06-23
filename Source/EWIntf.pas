@@ -179,6 +179,11 @@ type
 
   end;
 
+  IEWHTMLForm = interface
+    ['{A7DE2A3A-4B61-454D-B62B-DFDF87F6182E}']
+
+  end;
+
 
 implementation
 
