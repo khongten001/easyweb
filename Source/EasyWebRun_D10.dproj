@@ -119,6 +119,8 @@
         <DCCReference Include="EWBadge.pas"/>
         <DCCReference Include="EWCheckGroup.pas"/>
         <DCCReference Include="EWTable.pas"/>
+        <DCCReference Include="EWSweetAlert.pas"/>
+        <DCCReference Include="EWHtmlForm.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -142,14 +144,14 @@
                 <Excluded_Packages/>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\EasyWebRun_D10.bpl" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="Delphi10\EasyWebRun_D10.bpl" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\EasyWebRun_D10.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>EasyWebRun_D10.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\EasyWebRun_D10.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="Delphi10\EasyWebRun_D10.bpl" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>

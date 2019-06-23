@@ -36,7 +36,7 @@ type
     function GetName: string;
   protected
     procedure DoEvent(AParams: TStrings); virtual;
-
+    procedure GetRequiredThirdPartySrc(AStrings: TStrings); virtual;
     procedure GetGlobalVars(AStrings: TStrings); virtual;
     procedure Changed; virtual;
     function GetHtml: string;
@@ -66,6 +66,7 @@ type
   protected
     function GetID: string;
     function GetScript: string; virtual;
+    procedure GetRequiredThirdPartySrc(AStrings: TStrings); virtual;
     function ReplaceTokens(AHtml: string): string; virtual;
     procedure GetEventListners(AListners: TStrings); virtual;
     procedure GetGlobalVars(AStrings: TStrings); virtual;
@@ -156,6 +157,11 @@ end;
 function TEWBaseComponent.GetName: string;
 begin
   Result := Name;
+end;
+
+procedure TEWBaseComponent.GetRequiredThirdPartySrc(AStrings: TStrings);
+begin
+  // overridden in descendant classes.
 end;
 
 function TEWBaseComponent.GetScript: string;
@@ -472,6 +478,12 @@ end;
 function TewBaseObject.GetName: string;
 begin
   Result := Name;
+end;
+
+procedure TewBaseObject.GetRequiredThirdPartySrc(AStrings: TStrings);
+begin
+  inherited;
+  // overridden in descendant classes.
 end;
 
 function TewBaseObject.GetScript: string;

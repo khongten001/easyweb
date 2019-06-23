@@ -37,6 +37,9 @@ type
   TEWNavItemClickEvent = procedure(Sender: TObject; AItem: TCollectionItem; ADropDownIndex: integer) of object;
   TEWDropDownClickItemEvent = procedure(Sender: TObject; AItem: TCollectionItem; ADropDownIndex: integer) of object;
 
+  TEWConfirmResultEvent = procedure(Sender: TObject; AConfirmed: Boolean) of object;
+  TEWPromptResultEvent = procedure(Sender: TObject; AValue: string) of object;
+
   TEWKeyEvent = procedure(Sender: TObject; Key: Word) of object;
 
 

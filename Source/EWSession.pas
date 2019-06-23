@@ -104,16 +104,15 @@ begin
   inherited Create;
   FForms := TObjectList<TCustomForm>.Create(True);
   FDatamodule := SessionDataClass.Create(nil);
-
-
+  FSessionID := ASessionID;
+  FFormIndex := -1;
   AForm := EWMainFormClass.CreateNew(nil);
   InitInheritedComponent(AForm, TEWForm);
-  TEWForm(AForm).Session := Self;
-  FForms.Add(TCustomForm(AForm));
-
-  FSessionID := ASessionID;
-
-  FFormIndex := 0;
+  if Assigned(AForm.OnCreate) then
+      AForm.OnCreate(AForm);
+  PushForm(AForm);
+  //TEWForm(AForm).Session := Self;
+  //FForms.Add(TCustomForm(AForm));
   FRequiresReload := False;
 end;
 
@@ -126,7 +125,6 @@ end;
 
 procedure TEWSession.PopForm;
 begin
-
   FForms.Delete(FFormIndex);
   Dec(FFormIndex);
   FRequiresReload := True;
@@ -136,6 +134,7 @@ procedure TewSession.PushForm(AForm: TCustomForm);
 begin
   FForms.Add(AForm);
   FFormIndex := FFormIndex+1;
+  TEWForm(AForm).Session := Self;
   FRequiresReload := True;
 end;
 

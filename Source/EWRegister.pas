@@ -53,7 +53,8 @@ uses
   EWDialogs,
   EWCheckGroup,
   EWTable,
-  EWHtmlForm;
+  EWHtmlForm,
+  EWSweetAlert;
 
 
 type
@@ -91,6 +92,7 @@ begin
   RegisterComponents('EasyWeb', [TEWRadioGroup]);
   RegisterComponents('EasyWeb', [TEWTable]);
   RegisterComponents('EasyWeb', [TEWHTMLForm]);
+  RegisterComponents('EasyWeb', [TEWSweetAlert]);
 
   RegisterPropertyEditor(TypeInfo(string), TEWFont, 'Family', TEWFontFamilyList);
 end;

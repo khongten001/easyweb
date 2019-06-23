@@ -47,6 +47,7 @@ type
     function GetHasChanged: Boolean;
     function GetScript: string;
     procedure GetGlobalVars(AStrings: TStrings);
+    procedure GetRequiredThirdPartySrc(AStrings: TStrings);
     function GetHtml: string;
     procedure Changed;
     property Html: string read GetHtml;

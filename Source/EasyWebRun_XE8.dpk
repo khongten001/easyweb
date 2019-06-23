@@ -59,7 +59,8 @@ contains
   EWBadge in 'EWBadge.pas',
   EWCheckGroup in 'EWCheckGroup.pas',
   EWTable in 'EWTable.pas',
-  EWHtmlForm in 'EWHtmlForm.pas';
+  EWHtmlForm in 'EWHtmlForm.pas',
+  EWSweetAlert in 'EWSweetAlert.pas';
 
 end.
 

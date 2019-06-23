@@ -41,6 +41,7 @@ type
     FExtraScript: TStrings;
     FSession: TewSession;
     FDialogs: TEWDialog;
+    FOnCreate: TNotifyEvent;
 
     function GetHtml: string;
     function GetBootstrapFiles: string;
@@ -74,6 +75,8 @@ type
     property ExtraScript: TStrings read FExtraScript write SetExtraScript;
     property JavascriptIncludes: TStrings read FJavascriptIncludes write SetJavascriptIncludes;
     property PixelsPerInch;
+    property OnCreate: TNotifyEvent read FOnCreate write FOnCreate;
+    property OnDestroy;
     { Public declarations }
   end;
 
@@ -132,6 +135,8 @@ begin
     Bootstrap_v4_0: result := '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">';
     Bootstrap_v4_1: result := '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">';
     Bootstrap_v4_2: result := '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">';
+    Bootstrap_v4_3: result := '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">';
+
     else // useNewst
       result := '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">';
   end;
@@ -145,14 +150,12 @@ begin
   try
     if GlobalServerController.BootstrapVersion = Bootstrap_v4_0 then
     begin
-      AStrings.Add('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">');
       AStrings.Add('<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>');
       AStrings.Add('<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>');
       AStrings.Add('<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>');
     end;
     if GlobalServerController.BootstrapVersion = Bootstrap_v4_1 then
     begin
-      AStrings.Add('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">');
       AStrings.Add('<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>');
       AStrings.Add('<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>');
       AStrings.Add('<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>');
@@ -160,7 +163,6 @@ begin
 
     if GlobalServerController.BootstrapVersion = Bootstrap_v4_2 then
     begin
-      AStrings.Add('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">');
       AStrings.Add('<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>');
       AStrings.Add('<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>');
       AStrings.Add('<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>');
@@ -168,7 +170,6 @@ begin
 
     if (GlobalServerController.BootstrapVersion in [Bootstrap_v4_3, UseNewest]) then
     begin
-      AStrings.Add('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">');
       AStrings.Add('<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>');
       AStrings.Add('<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>');
       AStrings.Add('<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>');
@@ -189,19 +190,35 @@ var
   AIncludes: TStrings;
   AGlobals: TStrings;
   AViewPort: string;
+  AThirdParty: TStrings;
+  ASrc: string;
 begin
   AListners := TStringList.Create;
   AIncludes := TStringList.Create;
   AGlobals := TStringList.Create;
   try
+    TStringList(AIncludes).Duplicates := dupIgnore;
+    TStringList(AIncludes).Sorted := True;
+
     for ICount := 0 to FJavascriptIncludes.Count-1 do
       AIncludes.Add('<script src="'+FJavascriptIncludes[ICount]+'"></script>');
+
 
     for ICount := 0 to Self.ComponentCount-1 do
     begin
       if Supports(Self.Components[ICount], IEWBaseComponent, c) then
-        C.GetGlobalVars(AGlobals);
+      begin
+        AThirdParty := TStringList.Create;
 
+        try
+          c.GetRequiredThirdPartySrc(AThirdParty);
+          for ASrc in AThirdParty do
+            AIncludes.Add('<script src="'+ASrc+'"></script>');
+        finally
+          AThirdParty.Free;
+        end;
+        C.GetGlobalVars(AGlobals);
+      end;
 
       if Supports(Self.Components[ICount], IEWBaseVisualObject, i) then
       begin
@@ -222,7 +239,7 @@ begin
               '<title>'+Caption+'</title>'+CR+
              // '<meta charset="utf-8">'+CR+
               AViewPort+CR+
-              Trim(FExtraMeta.Text)+
+              Trim(FExtraMeta.Text)+CR+
               GetBootstrapCSS+CR+
               '<meta name="IncludesNext" />' + CR +
               Trim(AIncludes.Text)+CR+
@@ -280,7 +297,8 @@ var
 begin
   AStrings := TStringList.Create;
   AStrings.Text := Trim(AText);
-  PostMessage(Application.MainForm.Handle, WM_BS_LOGTEXT, Integer(AStrings), 0);
+  if Application.MainForm <> nil then
+    PostMessage(Application.MainForm.Handle, WM_BS_LOGTEXT, Integer(AStrings), 0);
 end;
 
 procedure TEWForm.PopForm;
@@ -298,6 +316,8 @@ begin
     AForm := ABsFormClass.CreateNew(nil);
     InitInheritedComponent(AForm, TewForm);
     AForm.Session := FSession;
+    if Assigned(AForm.OnCreate) then
+      AForm.OnCreate(AForm);
   end);
   Session.PushForm(AForm);
 end;

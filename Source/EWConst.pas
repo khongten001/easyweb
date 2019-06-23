@@ -29,6 +29,8 @@ interface
 uses Messages;
 
 const
+  C_SWEET_ALERT_URL = 'https://unpkg.com/sweetalert/dist/sweetalert.min.js';
+
   CR = #13#10;
 
   WM_BS_LOGTEXT = WM_USER + 1000;
@@ -37,6 +39,7 @@ const
   C_ACTION                    = 'action';
   C_ACTIVE                    = 'active';
   C_ALERT                     = 'alert("%text%");';
+  C_ALERT_SWEEET_ALERT        = 'swal({title: "%title%",text: "%text%",icon: "%icon%",button: "%button%"});';
   C_APPLICATION_JSON          = 'application/json';
   C_ASYNC                     = 'async';
   C_BACKGROUND_COLOR          = 'background-color';
