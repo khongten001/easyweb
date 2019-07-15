@@ -107,7 +107,7 @@ implementation
 
 uses Types, SysUtils, EWConst, Math;
 
-{ TEWLabel }
+{ TEWTable }
 
 
 procedure TEWTable.AddRow;

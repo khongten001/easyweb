@@ -48,6 +48,7 @@ type
     procedure SetPort(const Value: integer);
     procedure ServeImage(ASessionID, AImage: string; AResponseInfo: TIdHTTPResponseInfo);
     procedure SetDisableZoom(const Value: Boolean);
+    function GetIsListening: Boolean;
 
     { Private declarations }
   protected
@@ -64,6 +65,7 @@ type
     procedure StopListening;
     procedure ClearSessions;
     property BytesSent: integer read FBytesSent;
+    property IsListening: Boolean read GetIsListening;
     property Sessions: TEWSessionList read FSessions;
   published
     property BootstrapVersion: TEWBootstrapVersion read FBootstrapVersion write FBootstrapVersion default UseNewest;
@@ -300,8 +302,10 @@ begin
         else
         begin
           AHtml := Sessions.SessionByID[s].Html;
-          AResponseInfo.ContentText := AHtml;
           AResponseInfo.ContentType := C_TEXT_HTML;
+          AResponseInfo.CharSet := 'utf-8';
+          AResponseInfo.ContentText := AHtml;
+
         end;
       finally
         if Assigned(AResponseInfo.ContentStream) then
@@ -437,6 +441,11 @@ const
 
 begin
   result := format(EWCore_JS_Async, [FPort]);
+end;
+
+function TEWBaseServerController.GetIsListening: Boolean;
+begin
+  Result := FHttpServer.Active = True;
 end;
 
 class procedure TEWBaseServerController.Initialize;

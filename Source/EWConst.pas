@@ -117,10 +117,10 @@ const
 
   C_HTML_BUTTON_DROPDOWN      =     '<div name="%name%" id="%id%" class="btn-group" %style%><button class="%class% '+
                                     'dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" '+
-                                    'aria-haspopup="true" aria-expanded="false">%text%</button>%items%</div>';
+                                    'aria-haspopup="true" aria-expanded="false" title="%tooltip%">%text%</button>%items%</div>';
   C_HTML_BUTTON_DROPDOWN_MENU =     '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">%items%</div>';
   C_HTML_BUTTON_DROPDOWN_DIVIDER  = '<div class="dropdown-divider"></div>';
-  C_HTML_BUTTON_DROPDOWN_ITEM     = '<a class="dropdown-item %disabled%" id="%id%" href="#">%text%</a>';
+  C_HTML_BUTTON_DROPDOWN_ITEM     = '<a class="dropdown-item %disabled%" id="%id%" href="#" title="%tooltip%">%text%</a>';
   C_HTML_BUTTON_GROUP             = '<div %style% id="%id%" style="width:100%;height:100%;" class="%layout%" role="group">%items%</div>';
   C_HTML_BUTTON_GROUP_ITEM        = '<button type="button" id="%id%" style="flex:1;box-shadow: none" class="%class% %active%">%text%</button>';
   C_HTML_CHECKBOX                 =     '<div id="%id%" %style%>'+
@@ -139,9 +139,10 @@ const
   //C_HTML_EDIT                     = '<div class="form-group" placeholder="%placeholder%" ><div class="input-group" placeholder="%placeholder%" ><span id="%id%" %style% type="%type%" class="form-control" placeholder="%placeholder%" %extratags% value="%text%" "></span></div></div>';
 
   C_HTML_IMAGE                    = '<img  id="%id%" %style% style="width:100%;height:auto;"  rel="prefetch" class= "%clsss" src="%src%">';
-  C_HTML_LABEL                    = '<div id="%id%" %style%>%text%</div>';
+  C_HTML_LABEL                    = '<div id="%id%" %style% title="%tooltip%">%text%</div>';
   C_HTML_TABLE                    = '<div id="%id%" %style%><table class="table %striped% %theme% %hover%" style="width:100%"><thead>%header%</thead><tbody>%content%</tbody></table></div>';
   C_HTML_TEXT_AREA                = '<textarea id="%id%" %style% class="form-control" cols="80" rows="5">%text%</textarea>';
+  C_HTML_CUSTOM_HTML              = '<div id="%id%" %style% ">%html%</div>';
 
 
 resourcestring

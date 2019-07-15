@@ -26,13 +26,14 @@ package EasyWebDsgn_XE8;
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$DESIGNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   designide,
   IndySystem,
   IndyProtocols,
   IndyCore,
+  dbrtl,
   EasyWebRun_XE8;
 
 contains
@@ -41,6 +42,9 @@ contains
   EWIdeHelpers in 'EWIdeHelpers.pas';
 
 end.
+
+
+
 
 
 

@@ -34,6 +34,8 @@ type
   TEWForm = class;
   TEWFormClass = class of TEWForm;
 
+  //TEWHtmlSection = (ewsMeta,
+
   TEWForm = class(TEWBaseForm, IEWForm)
   private
     FJavascriptIncludes: TStrings;
@@ -192,6 +194,7 @@ var
   AViewPort: string;
   AThirdParty: TStrings;
   ASrc: string;
+
 begin
   AListners := TStringList.Create;
   AIncludes := TStringList.Create;
@@ -239,8 +242,8 @@ begin
               '<title>'+Caption+'</title>'+CR+
              // '<meta charset="utf-8">'+CR+
               AViewPort+CR+
-              Trim(FExtraMeta.Text)+CR+
               GetBootstrapCSS+CR+
+              Trim(FExtraMeta.Text)+CR+
               '<meta name="IncludesNext" />' + CR +
               Trim(AIncludes.Text)+CR+
               '<meta name="StylesNext" />' + CR +
@@ -253,15 +256,24 @@ begin
 
       for ICount := 0 to ComponentCount-1 do
       begin
-        if Self.Components[ICount] is TEWBaseComponent then
-          Result := Result + TEWBaseComponent(Self.Components[ICount]).Html +CR;
-
-
-        if Self.Components[ICount] is TEWBaseObject then
+        if (Supports(Self.Components[ICount], IEWBaseComponent, C)) then
         begin
-          if TewBaseObject(Self.Components[ICount] ).Parent = Self then
-            Result := Result + TEWBaseObject(Self.Components[ICount]).Html +CR;
+          if (Self.Components[ICount] is TewBaseObject)  then
+          begin
+            if (Self.Components[ICount] as TewBaseObject).Parent = Self then
+              Result := Result + C.Html +CR;
+          end
+          else
+            Result := Result + C.Html +CR;
+
+
         end;
+          {if (Self.Components[ICount] is TewBaseObject)  then
+          begin
+            if (Self.Components[ICount] is TewBaseObject) then
+
+          end; }
+
       end;
 
     Result := Result +CR+
@@ -271,6 +283,7 @@ begin
 
               GetBootstrapFiles +
               '<script type="text/javascript" src="/ewcore.js"></script>'+CR+
+
               '<script type="text/javascript">'+CR+
                 Trim(AListners.Text)) + CR + CR +
                 ' // Extra Script: ' + CR +

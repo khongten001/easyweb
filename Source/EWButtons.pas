@@ -38,6 +38,7 @@ type
     FOutline: Boolean;
     FText: string;
     FBadge: TEWBadge;
+    FToolTip: string;
     function GetButtonType: TewButtonType; virtual;
     function GetButtonTypeStr: string;
     procedure SetButtonType(const Value: TewButtonType);
@@ -46,6 +47,7 @@ type
     procedure SetBorderRadius(const Value: integer);
     procedure SetOutline(const Value: Boolean);
     procedure SetBadge(const Value: TEWBadge);
+    procedure SetToolTip(const Value: string);
   protected
     function ReplaceTokens(AHtml: string): string; override;
     function GenerateHtml: string; override;
@@ -56,6 +58,7 @@ type
     property Badge: TEWBadge read FBadge write SetBadge;
     property Outline: Boolean read FOutline write SetOutline default False;
     property BorderRadius: integer read FBorderRadius write SetBorderRadius default 0;
+    property ToolTip: string read FToolTip write SetToolTip;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -70,6 +73,7 @@ type
     property Badge;
     property Outline;
     property BorderRadius;
+    property ToolTip;
   end;
 
   TEWDropDownItem = class(TCollectionItem)
@@ -78,10 +82,12 @@ type
     FText: string;
     FEnabled: Boolean;
     FDivider: Boolean;
+    FToolTip: string;
     procedure SetText(const Value: string);
     procedure Changed;
     procedure SetDivider(const Value: Boolean);
     procedure SetEnabled(const Value: Boolean);
+    procedure SetToolTip(const Value: string);
   public
     function GetHtml: string;
     procedure Assign(Source: TPersistent); override;
@@ -90,6 +96,7 @@ type
     property Text: string read FText write SetText;
     property Enabled: Boolean read FEnabled write SetEnabled default True;
     property Divider: Boolean read FDivider write SetDivider default False;
+    property ToolTip: string read FToolTip write SetToolTip;
   end;
 
   TEWDropDownItemCollection = class(TCollection)
@@ -290,6 +297,7 @@ begin
   Result := StringReplace(Result,'%class%', GetButtonTypeStr, []);
   Result := StringReplace(Result,'%badge%', FBadge.Html, []);
   Result := StringReplace(Result,'%text%', FText, []);
+  Result := StringReplace(Result, '%tooltip%', FToolTip, []);
 end;
 
 procedure TEWBaseButton.SetButtonType(const Value: TewButtonType);
@@ -329,6 +337,15 @@ begin
   if FText <> Value then
   begin
     FText := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWBaseButton.SetToolTip(const Value: string);
+begin
+  if FToolTip <> Value then
+  begin
+    FToolTip := Value;
     Changed;
   end;
 end;
@@ -598,6 +615,7 @@ begin
     Result := StringReplace(Result, '%disabled%', ADisabled, []);
     Result := StringReplace(Result, '%id%', FButton.Name+C_ITEM+Index.ToString, []);
     Result := StringReplace(Result, '%text%', FText, []);
+    Result := StringReplace(Result, '%tooltip%', FToolTip, []);
   end;
 end;
 
@@ -625,6 +643,15 @@ begin
   if FText <> Value then
   begin
     FText := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWDropDownItem.SetToolTip(const Value: string);
+begin
+  if FToolTip <> Value then
+  begin
+    FToolTip := Value;
     Changed;
   end;
 end;

@@ -54,7 +54,8 @@ uses
   EWCheckGroup,
   EWTable,
   EWHtmlForm,
-  EWSweetAlert;
+  EWSweetAlert,
+  EWCustomHTML;
 
 
 type
@@ -93,6 +94,7 @@ begin
   RegisterComponents('EasyWeb', [TEWTable]);
   RegisterComponents('EasyWeb', [TEWHTMLForm]);
   RegisterComponents('EasyWeb', [TEWSweetAlert]);
+  RegisterComponents('EasyWeb', [TEWCustomHTML]);
 
   RegisterPropertyEditor(TypeInfo(string), TEWFont, 'Family', TEWFontFamilyList);
 end;

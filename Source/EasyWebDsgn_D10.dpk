@@ -32,8 +32,8 @@ requires
   IndySystem,
   IndyProtocols,
   IndyCore,
-  EasyWebRun_D10,
-  designide;
+  designide,
+  easywebrun_d10;
 
 contains
   EWRegister in 'EWRegister.pas',
@@ -41,6 +41,10 @@ contains
   EWIdeHelpers in 'EWIdeHelpers.pas';
 
 end.
+
+
+
+
 
 
 

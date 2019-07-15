@@ -100,6 +100,7 @@ type
     { Private declarations }
   protected
     procedure DoShow; override;
+    procedure DoClose(var Action: TCloseAction); override;
   public
     constructor Create(AOwner: TComponent); override;
     { Public declarations }
@@ -160,9 +161,12 @@ end;
 
 procedure TfrmStartup.actStopServerExecute(Sender: TObject);
 begin
-  LogText(C_SERVER_STOPPING);
-  GlobalServerController.StopListening;
-  LogText(C_SERVER_STOPPED);
+  if GlobalServerController.IsListening then
+  begin
+    LogText(C_SERVER_STOPPING);
+    GlobalServerController.StopListening;
+    LogText(C_SERVER_STOPPED);
+  end;
 end;
 
 constructor TfrmStartup.Create(AOwner: TComponent);
@@ -170,6 +174,12 @@ begin
   inherited;
   UpdateStatusBar;
   PageControl1.ActivePageIndex := 0;
+end;
+
+procedure TfrmStartup.DoClose(var Action: TCloseAction);
+begin
+  actStopServer.Execute;
+  inherited;
 end;
 
 procedure TfrmStartup.DoShow;

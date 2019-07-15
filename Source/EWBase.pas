@@ -108,6 +108,7 @@ type
     function SessionID: string;
     property Html: string read GetHtml;
     property HasChanged: Boolean read GetHasChanged write FChanged;
+    property Parent;
   published
     property ExtraHtmlTags: TStrings read FExtraHtmlTags write SetExtraHtmlTags;
     property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;

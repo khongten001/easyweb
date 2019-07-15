@@ -60,7 +60,8 @@ contains
   EWCheckGroup in 'EWCheckGroup.pas',
   EWTable in 'EWTable.pas',
   EWHtmlForm in 'EWHtmlForm.pas',
-  EWSweetAlert in 'EWSweetAlert.pas';
+  EWSweetAlert in 'EWSweetAlert.pas',
+  EWCustomHTML in 'EWCustomHTML.pas';
 
 end.
 

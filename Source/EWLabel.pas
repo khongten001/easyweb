@@ -36,6 +36,7 @@ type
     FText: string;
     FVertAlignment: TVerticalAlignment;
     FFont: TEWFont;
+    FToolTip: string;
 
     function GetText: string;
     procedure SetText(const Value: string);
@@ -44,6 +45,7 @@ type
     procedure SetBackgroundColor(const Value: TColor);
     procedure SetFont(const Value: TEWFont);
     procedure FontChanged(Sender: TObject);
+    procedure SetToolTip(const Value: string);
   protected
     procedure BuildCss(AProperties: TStrings); override;
     function DesignTimeCaption: string; override;
@@ -58,6 +60,7 @@ type
     property Alignment: TAlignment read FAlignment write SetAlignment default taLeftJustify;
     property Font: TEWFont read FFont write SetFont;
     property Text: string read GetText write SetText;
+    property ToolTip: string read FToolTip write SetToolTip;
     property VertAlignment: TVerticalAlignment read FVertAlignment write SetVertAlignment default taVerticalCenter;
   end;
 
@@ -114,6 +117,7 @@ begin
   inherited;
   Result := ReplaceTokens(C_HTML_LABEL);
   Result := StringReplace(Result, '%text%', FText, []);
+  Result := StringReplace(Result, '%tooltip%', FToolTip, []);
 end;
 
 function TEWLabel.GetText: string;
@@ -173,6 +177,15 @@ begin
   if FText <> Value then
   begin
     FText := Value;
+    Changed;
+  end;
+end;
+
+procedure TEWLabel.SetToolTip(const Value: string);
+begin
+  if FToolTip <> Value then
+  begin
+    FToolTip := Value;
     Changed;
   end;
 end;

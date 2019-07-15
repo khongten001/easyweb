@@ -85,8 +85,8 @@
         <DCCReference Include="IndySystem.dcp"/>
         <DCCReference Include="IndyProtocols.dcp"/>
         <DCCReference Include="IndyCore.dcp"/>
-        <DCCReference Include="EasyWebRun_D10.dcp"/>
         <DCCReference Include="designide.dcp"/>
+        <DCCReference Include="easywebrun_d10.dcp"/>
         <DCCReference Include="EWRegister.pas"/>
         <DCCReference Include="EWIdeWizard.pas"/>
         <DCCReference Include="EWIdeHelpers.pas"/>

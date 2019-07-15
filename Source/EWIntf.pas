@@ -38,6 +38,10 @@ type
 
   end;
 
+
+
+
+
   IEWBaseComponent = interface
     ['{9097EA58-A758-4100-BF04-B4AA2F42AA7B}']
 
@@ -184,6 +188,13 @@ type
     ['{A7DE2A3A-4B61-454D-B62B-DFDF87F6182E}']
 
   end;
+
+    IEWCustomHTML = interface
+    ['{5FCBFE57-B074-4EC2-953F-042CCB9504A1}']
+
+  end;
+
+
 
 
 implementation
